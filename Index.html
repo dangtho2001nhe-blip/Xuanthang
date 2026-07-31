@@ -3,336 +3,341 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Alien & Con Ma</title>
+    <title>Super Game Cyberpunk</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
         body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
-        /* Container Chính */
         .card { 
             background: rgba(22, 33, 62, 0.95); 
-            padding: 20px; 
+            padding: 15px; 
             border-radius: 20px; 
             width: 100%; 
-            max-width: 380px; 
+            max-width: 400px; 
             text-align: center; 
-            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2), inset 0 0 15px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2);
             border: 1px solid rgba(0, 255, 245, 0.3);
-            backdrop-filter: blur(10px);
         }
 
-        /* Title & Tabs */
-        h2 { color: #00fff5; margin: 0 0 15px 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1.5px; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
+        h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
         
-        .auth-tabs { display: flex; margin-bottom: 20px; border-bottom: 2px solid #0f3460; }
-        .tab-btn { flex: 1; padding: 10px; background: none; border: none; color: #8a8a8a; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.3s; }
-        .tab-btn.active { color: #00fff5; border-bottom: 3px solid #00fff5; text-shadow: 0 0 5px rgba(0,255,245,0.5); }
+        /* Navigation Tabs */
+        .nav-bar { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 12px; }
+        .nav-btn { flex: 1; padding: 8px 2px; background: none; border: none; color: #8a8a8a; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
-        /* Form Inputs */
-        .input-group { margin-bottom: 15px; text-align: left; }
-        .input-group label { display: block; font-size: 12px; color: #a29bfe; margin-bottom: 5px; text-transform: uppercase; }
-        input { 
-            width: 100%; 
-            padding: 12px 15px; 
-            border-radius: 10px; 
-            border: 1px solid #1f4068; 
-            background: #0f172a; 
-            color: #fff; 
-            font-size: 15px; 
-            outline: none; 
-            transition: 0.3s; 
-        }
-        input:focus { border-color: #00fff5; box-shadow: 0 0 8px rgba(0, 255, 245, 0.4); }
-
-        /* Buttons */
-        button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 10px; border: none; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        /* General Inputs & Buttons */
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; color: #a29bfe; margin-bottom: 4px; }
+        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: #0f172a; color: #fff; outline: none; }
+        
+        button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
         button:active { transform: scale(0.98); }
-        .btn-primary { background: linear-gradient(45deg, #00fff5, #00a8ff); color: #0a0a16; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 4px 15px rgba(0, 255, 245, 0.3); }
-        .btn-alien { background: #a29bfe; color: #2d3436; }
-        .btn-ghost { background: #fd79a8; color: #fff; }
-        .btn-danger { background: #e94560; color: #fff; }
+        .btn-primary { background: linear-gradient(45deg, #00fff5, #00a8ff); color: #0a0a16; }
         .btn-success { background: #00b894; color: #fff; }
-        button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; box-shadow: none !important; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .btn-warning { background: #fdcb6e; color: #2d3436; }
+        button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
 
         .hidden { display: none !important; }
-        #status { margin-top: 12px; font-size: 13px; font-weight: bold; min-height: 18px; }
-        .money-box { font-size: 18px; font-weight: bold; color: #f1c40f; margin: 5px 0; text-shadow: 0 0 5px rgba(241, 196, 15, 0.5); }
-        
-        /* Canvas */
-        canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 210px; display: block; margin: 10px 0; box-shadow: 0 0 10px rgba(0, 255, 245, 0.2); }
+        .money-box { font-size: 16px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; }
+
+        /* Canvas Game */
+        canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 200px; display: block; margin-bottom: 8px; }
 
         /* D-Pad Controls */
-        .controls-container { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
-        .dpad { display: grid; grid-template-columns: repeat(3, 42px); grid-template-rows: repeat(3, 42px); gap: 4px; }
-        .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 16px; border-radius: 8px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .dpad-btn:active { background: #00fff5; color: #16213e; }
+        .controls-container { display: flex; justify-content: space-between; align-items: center; }
+        .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
+        .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 14px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .dpad-up { grid-column: 2; grid-row: 1; }
         .dpad-left { grid-column: 1; grid-row: 2; }
         .dpad-right { grid-column: 3; grid-row: 2; }
         .dpad-down { grid-column: 2; grid-row: 3; }
-
         .action-btns { width: 55%; display: flex; flex-direction: column; gap: 4px; }
+
+        /* Item Cards (Shop & Balo) */
+        .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { text-align: left; }
+        .item-title { font-weight: bold; color: #00fff5; font-size: 14px; }
+        .item-desc { font-size: 11px; color: #aaa; }
+
+        /* Chat Box */
+        .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 180px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 12px; margin-bottom: 8px; }
+        .chat-msg { margin-bottom: 5px; word-break: break-all; }
+        .chat-user { color: #00fff5; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- MÀN HÌNH ĐĂNG NHẬP / ĐĂNG KÝ -->
+    <!-- AUTH PANEL -->
     <div id="auth-panel" class="card">
-        <h2 id="auth-title">ĐĂNG NHẬP</h2>
-        
-        <div class="auth-tabs">
-            <button id="tab-login" class="tab-btn active" onclick="switchTab('login')">Đăng Nhập</button>
-            <button id="tab-register" class="tab-btn" onclick="switchTab('register')">Đăng Ký</button>
-        </div>
-
+        <h2>CYBER WORLD</h2>
         <div class="input-group">
-            <label>Tài khoản</label>
-            <input type="text" id="username" placeholder="Nhập tên tài khoản...">
+            <label>Tài Khoản</label>
+            <input type="text" id="username" placeholder="Nhập tên...">
         </div>
-        
         <div class="input-group">
-            <label>Mật khẩu</label>
+            <label>Mật Khẩu</label>
             <input type="password" id="password" placeholder="Nhập mật khẩu...">
         </div>
-        
-        <button id="auth-submit-btn" class="btn-primary" onclick="handleAuth()">VÀO GAME</button>
-        
-        <p id="status"></p>
+        <button class="btn-primary" onclick="handleAuth('login')">ĐĂNG NHẬP</button>
+        <button class="btn-success" onclick="handleAuth('register')">ĐĂNG KÝ</button>
+        <p id="status" style="font-size: 12px; color: #ff4757;"></p>
     </div>
 
-    <!-- MÀN HÌNH TRONG GAME -->
+    <!-- MAIN GAME PANEL -->
     <div id="game-panel" class="card hidden">
-        <h2 id="welcome-text">GAME SPACE & GHOST</h2>
-        <div class="money-box">💰 <span id="money-display">0</span> Xu</div>
+        <div class="money-box">👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</div>
         
-        <canvas id="gameCanvas" width="360" height="210"></canvas>
+        <!-- NAV BAR -->
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
+            <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
+            <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
+            <button class="nav-btn" onclick="switchPage('pvp')">PVP</button>
+            <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
+        </div>
 
-        <!-- D-PAD VÀ HÀNH ĐỘNG -->
-        <div class="controls-container">
-            <div class="dpad">
-                <div class="dpad-btn dpad-up" ontouchstart="startMove('up')" ontouchend="stopMove('up')" onmousedown="startMove('up')" onmouseup="stopMove('up')">▲</div>
-                <div class="dpad-btn dpad-left" ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')">◀</div>
-                <div class="dpad-btn dpad-right" ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')">▶</div>
-                <div class="dpad-btn dpad-down" ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')">▼</div>
-            </div>
-
-            <div class="action-btns">
-                <button id="alienSkillBtn" class="btn-alien" onclick="useAlienSkill()">🛸 Vòng Năng Lượng (36s)</button>
-                <button id="ghostSkillBtn" class="btn-ghost" onclick="useGhostSkill()" disabled>👻 Bất Tử (Khóa)</button>
-                <button id="buyGhostBtn" class="btn-ghost" onclick="buyGhost()">🛒 Mua Con Ma (1 xu)</button>
-                <button class="btn-success" onclick="addMoney(1)" style="padding: 6px;">💵 Cày 1 Xu</button>
-                <button class="btn-danger" onclick="logout()" style="padding: 6px;">Thoát Game</button>
+        <!-- 1. PLAY TAB -->
+        <div id="tab-play" class="page-tab">
+            <canvas id="gameCanvas" width="360" height="200"></canvas>
+            <div class="controls-container">
+                <div class="dpad">
+                    <div class="dpad-btn dpad-up" ontouchstart="startMove('up')" ontouchend="stopMove('up')" onmousedown="startMove('up')" onmouseup="stopMove('up')">▲</div>
+                    <div class="dpad-btn dpad-left" ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')">◀</div>
+                    <div class="dpad-btn dpad-right" ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')">▶</div>
+                    <div class="dpad-btn dpad-down" ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')">▼</div>
+                </div>
+                <div class="action-btns">
+                    <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Không Có Skill</button>
+                    <button class="btn-success" onclick="addMoney(1)" style="padding: 5px;">💵 Cày 1 Xu</button>
+                    <button class="btn-danger" onclick="logout()" style="padding: 5px;">Thoát Game</button>
+                </div>
             </div>
         </div>
+
+        <!-- 2. SHOP TAB -->
+        <div id="tab-shop" class="page-tab hidden">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">👻 Con Ma</div>
+                    <div class="item-desc">Skill: Bất tử 5s (Hồi 15s)</div>
+                </div>
+                <button id="buy-ghost-btn" class="btn-warning" style="width: 100px;" onclick="buyItem('ghost', 1)">1 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🛸 Alien</div>
+                    <div class="item-desc">Skill: Vòng Năng Lượng 20s</div>
+                </div>
+                <button id="buy-alien-btn" class="btn-warning" style="width: 100px;" onclick="buyItem('alien', 2)">2 Xu</button>
+            </div>
+        </div>
+
+        <!-- 3. BALO TAB -->
+        <div id="tab-balo" class="page-tab hidden">
+            <div id="inventory-list"></div>
+        </div>
+
+        <!-- 4. PVP TAB -->
+        <div id="tab-pvp" class="page-tab hidden">
+            <p style="font-size: 13px; color: #aaa;">Đang tìm đối thủ trong khu vực...</p>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">⚔️ Đấu Trường 1v1</div>
+                    <div class="item-desc">Thách đấu ngẫu nhiên</div>
+                </div>
+                <button class="btn-danger" style="width: 100px;" onclick="startPVP()">CHẾT BỎ</button>
+            </div>
+            <p id="pvp-result" style="font-weight: bold; color: #00fff5; margin-top: 15px;"></p>
+        </div>
+
+        <!-- 5. CHAT TAB -->
+        <div id="tab-chat" class="page-tab hidden">
+            <div class="chat-box" id="chat-messages">
+                <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Chào mừng tới phòng chat thế giới!</div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
+                <button class="btn-primary" style="width: 80px; margin: 0;" onclick="sendChat()">GỬI</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
         let currentAccount = null;
-        let authMode = 'login'; // 'login' hoặc 'register'
+        let userData = { money: 0, inventory: ['human'], equipped: 'human' };
 
-        // --- CHUYỂN TAB ĐĂNG NHẬP / ĐĂNG KÝ ---
-        function switchTab(mode) {
-            authMode = mode;
-            let status = document.getElementById('status');
-            status.innerText = "";
-            
-            if (mode === 'login') {
-                document.getElementById('tab-login').classList.add('active');
-                document.getElementById('tab-register').classList.remove('active');
-                document.getElementById('auth-title').innerText = "ĐĂNG NHẬP";
-                document.getElementById('auth-submit-btn').innerText = "VÀO GAME";
+        // --- AUTH ---
+        function handleAuth(type) {
+            let u = document.getElementById('username').value.trim();
+            let p = document.getElementById('password').value.trim();
+            let st = document.getElementById('status');
+            if(!u || !p) return st.innerText = "Chưa nhập thông tin!";
+
+            if(type === 'register') {
+                if(localStorage.getItem('acc_' + u)) return st.innerText = "Tài khoản đã tồn tại!";
+                let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human' };
+                localStorage.setItem('acc_' + u, JSON.stringify(newData));
+                st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công! Hãy bấm Đăng Nhập.";
             } else {
-                document.getElementById('tab-register').classList.add('active');
-                document.getElementById('tab-login').classList.remove('active');
-                document.getElementById('auth-title').innerText = "TẠO TÀI KHOẢN";
-                document.getElementById('auth-submit-btn').innerText = "TẠO TÀI KHOẢN";
-            }
-        }
-
-        // --- XỬ LÝ ĐĂNG NHẬP & ĐĂNG KÝ ---
-        function handleAuth() {
-            let user = document.getElementById('username').value.trim();
-            let pass = document.getElementById('password').value.trim();
-            let status = document.getElementById('status');
-
-            if (!user || !pass) {
-                status.style.color = '#ff4757';
-                status.innerText = "❌ Vui lòng nhập đủ tài khoản & mật khẩu!";
-                return;
-            }
-
-            if (authMode === 'register') {
-                // Đăng ký
-                if (localStorage.getItem('user_' + user)) {
-                    status.style.color = '#ff4757';
-                    status.innerText = "❌ Tài khoản này đã tồn tại!";
-                    return;
-                }
-                localStorage.setItem('user_' + user, pass);
-                localStorage.setItem('money_' + user, 0);
-                status.style.color = '#2ed573';
-                status.innerText = "✔ Đăng ký thành công! Hãy bấm Đăng Nhập.";
-                switchTab('login');
-            } else {
-                // Đăng nhập
-                let savedPass = localStorage.getItem('user_' + user);
-                if (!savedPass) {
-                    status.style.color = '#ff4757';
-                    status.innerText = "❌ Tài khoản không tồn tại!";
-                    return;
-                }
-
-                if (pass === savedPass) {
-                    currentAccount = user;
-                    status.innerText = "";
-                    
-                    // Ẩn Login, Hiện Game
-                    document.getElementById('auth-panel').classList.add('hidden');
-                    document.getElementById('game-panel').classList.remove('hidden');
-                    document.getElementById('welcome-text').innerText = "PLAYER: " + user.toUpperCase();
-                    
-                    updateMoneyUI();
-                    checkGhostStatus();
-                    initGame();
-                } else {
-                    status.style.color = '#ff4757';
-                    status.innerText = "❌ Mật khẩu không chính xác!";
-                }
-            }
-        }
-
-        function addMoney(amount) {
-            if (!currentAccount) return;
-            let money = parseInt(localStorage.getItem('money_' + currentAccount)) || 0;
-            money += amount;
-            localStorage.setItem('money_' + currentAccount, money);
-            updateMoneyUI();
-        }
-
-        function updateMoneyUI() {
-            let money = localStorage.getItem('money_' + currentAccount) || 0;
-            document.getElementById('money-display').innerText = money;
-        }
-
-        function logout() {
-            currentAccount = null;
-            document.getElementById('game-panel').classList.add('hidden');
-            document.getElementById('auth-panel').classList.remove('hidden');
-            document.getElementById('username').value = "";
-            document.getElementById('password').value = "";
-        }
-
-        // --- SHOP & TÍNH NĂNG CON MA ---
-        let hasGhost = false;
-
-        function checkGhostStatus() {
-            let bought = localStorage.getItem('ghost_' + currentAccount);
-            let buyBtn = document.getElementById('buyGhostBtn');
-            let ghostSkillBtn = document.getElementById('ghostSkillBtn');
-
-            if (bought === 'true') {
-                hasGhost = true;
-                buyBtn.innerText = "👻 Đã sở hữu Ma";
-                buyBtn.disabled = true;
-                ghostSkillBtn.disabled = false;
-                ghostSkillBtn.innerText = "👻 Skill Bất Tử (15s)";
-            } else {
-                hasGhost = false;
-                buyBtn.innerText = "🛒 Mua Con Ma (1 xu)";
-                buyBtn.disabled = false;
-                ghostSkillBtn.disabled = true;
-                ghostSkillBtn.innerText = "👻 Bất Tử (Cần mua Ma)";
-            }
-        }
-
-        function buyGhost() {
-            let money = parseInt(localStorage.getItem('money_' + currentAccount)) || 0;
-            if (money >= 1) {
-                money -= 1;
-                localStorage.setItem('money_' + currentAccount, money);
-                localStorage.setItem('ghost_' + currentAccount, 'true');
+                let data = localStorage.getItem('acc_' + u);
+                if(!data) return st.innerText = "Tài khoản không tồn tại!";
+                let parsed = JSON.parse(data);
+                if(parsed.pass !== p) return st.innerText = "Sai mật khẩu!";
                 
-                updateMoneyUI();
-                checkGhostStatus();
-                alert("🎉 Chúc mừng! Bạn đã sở hữu Con Ma.");
-            } else {
-                alert("⚠️ Bạn cần ít nhất 1 xu để mua Con Ma!");
+                currentAccount = u;
+                userData = parsed;
+                document.getElementById('auth-panel').classList.add('hidden');
+                document.getElementById('game-panel').classList.remove('hidden');
+                document.getElementById('user-display').innerText = u;
+                updateUI();
+                initGame();
             }
         }
 
-        // --- MECHANIC GAME & CANVAS ---
+        function saveData() {
+            if(currentAccount) localStorage.setItem('acc_' + currentAccount, JSON.stringify(userData));
+        }
+
+        function addMoney(amt) {
+            userData.money += amt;
+            saveData();
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById('money-display').innerText = userData.money;
+            updateShopUI();
+            updateBaloUI();
+            updateSkillButton();
+        }
+
+        // --- NAVIGATION ---
+        function switchPage(page) {
+            document.querySelectorAll('.page-tab').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + page).classList.remove('hidden');
+            event.target.classList.add('active');
+        }
+
+        // --- SHOP & BALO ---
+        function buyItem(item, price) {
+            if(userData.inventory.includes(item)) return alert("Bạn đã có nhân vật này!");
+            if(userData.money < price) return alert("Không đủ xu!");
+            
+            userData.money -= price;
+            userData.inventory.push(item);
+            saveData();
+            updateUI();
+            alert("Mua thành công!");
+        }
+
+        function updateShopUI() {
+            let bGhost = document.getElementById('buy-ghost-btn');
+            let bAlien = document.getElementById('buy-alien-btn');
+            if(userData.inventory.includes('ghost')) { bGhost.innerText = "Đã Sở Hữu"; bGhost.disabled = true; }
+            if(userData.inventory.includes('alien')) { bAlien.innerText = "Đã Sở Hữu"; bAlien.disabled = true; }
+        }
+
+        function updateBaloUI() {
+            let list = document.getElementById('inventory-list');
+            list.innerHTML = "";
+            
+            const names = { human: "Người Bình Thường (Không Kỹ Năng)", ghost: "Con Ma (Bất Tử)", alien: "Alien (Vòng Năng Lượng)" };
+
+            userData.inventory.forEach(item => {
+                let isEquipped = userData.equipped === item;
+                list.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-title">${names[item]}</div>
+                            <div class="item-desc">${isEquipped ? '🟢 Đang Trang Bị' : '⚪ Trong Balo'}</div>
+                        </div>
+                        <button class="${isEquipped ? 'btn-success' : 'btn-primary'}" style="width: 100px;" ${isEquipped ? 'disabled' : ''} onclick="equipItem('${item}')">
+                            ${isEquipped ? 'ĐANG DÙNG' : 'TRANG BỊ'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function equipItem(item) {
+            userData.equipped = item;
+            saveData();
+            updateUI();
+        }
+
+        // --- SKILL CONTROL ---
+        let skillCD = false;
+        function updateSkillButton() {
+            let btn = document.getElementById('skillBtn');
+            if(userData.equipped === 'human') {
+                btn.innerText = "🔒 Không Có Skill";
+                btn.disabled = true;
+            } else if(userData.equipped === 'ghost') {
+                btn.innerText = "👻 Skill Bất Tử (15s)";
+                btn.disabled = skillCD;
+            } else if(userData.equipped === 'alien') {
+                btn.innerText = "🛸 Vòng Năng Lượng (36s)";
+                btn.disabled = skillCD;
+            }
+        }
+
+        function useActiveSkill() {
+            if(skillCD) return;
+            let btn = document.getElementById('skillBtn');
+
+            if(userData.equipped === 'ghost') {
+                ghostInvincible.active = true;
+                setTimeout(() => { ghostInvincible.active = false; }, 5000);
+                startCooldown(15, "Skill Bất Tử");
+            } else if(userData.equipped === 'alien') {
+                alienShield.active = true;
+                setTimeout(() => { alienShield.active = false; }, 20000);
+                startCooldown(36, "Vòng Năng Lượng");
+            }
+        }
+
+        function startCooldown(seconds, name) {
+            skillCD = true;
+            let btn = document.getElementById('skillBtn');
+            let timer = seconds;
+            btn.disabled = true;
+            let cd = setInterval(() => {
+                timer--;
+                if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
+                else {
+                    clearInterval(cd);
+                    skillCD = false;
+                    updateSkillButton();
+                }
+            }, 1000);
+        }
+
+        // --- GAME ENGINE ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-
         let moveState = { up: false, down: false, left: false, right: false };
-        let player = { x: 180, y: 105, radius: 12, speed: 2.5 };
+        let player = { x: 180, y: 100, radius: 12, speed: 2.5 };
+        let alienShield = { active: false, radius: 45 };
+        let ghostInvincible = { active: false };
+        let npcs = [{ x: 50, y: 50, radius: 8, speed: 1 }, { x: 300, y: 150, radius: 8, speed: 1 }];
 
-        let alienShield = { active: false, radius: 45, duration: 20000, cooldown: 36000, cdTimer: 0 };
-        let ghostInvincible = { active: false, duration: 5000, cooldown: 15000, cdTimer: 0 };
+        function startMove(d) { moveState[d] = true; }
+        function stopMove(d) { moveState[d] = false; }
 
-        let npcs = [];
-        for(let i = 0; i < 4; i++) {
-            npcs.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, radius: 8, speed: 1.0 });
-        }
-
-        function startMove(dir) { moveState[dir] = true; }
-        function stopMove(dir) { moveState[dir] = false; }
-
-        function useAlienSkill() {
-            if (alienShield.active || alienShield.cdTimer > 0) return;
-            alienShield.active = true;
-            let btn = document.getElementById('alienSkillBtn');
-            btn.disabled = true;
-
-            setTimeout(() => { alienShield.active = false; }, alienShield.duration);
-
-            alienShield.cdTimer = 36;
-            let cd = setInterval(() => {
-                alienShield.cdTimer--;
-                if(alienShield.cdTimer > 0) {
-                    btn.innerText = `Hồi Vòng (${alienShield.cdTimer}s)`;
-                } else {
-                    clearInterval(cd);
-                    btn.disabled = false;
-                    btn.innerText = "🛸 Vòng Năng Lượng (36s)";
-                }
-            }, 1000);
-        }
-
-        function useGhostSkill() {
-            if (!hasGhost || ghostInvincible.active || ghostInvincible.cdTimer > 0) return;
-            
-            ghostInvincible.active = true;
-            let btn = document.getElementById('ghostSkillBtn');
-            btn.disabled = true;
-
-            setTimeout(() => { ghostInvincible.active = false; }, ghostInvincible.duration);
-
-            ghostInvincible.cdTimer = 15;
-            let cd = setInterval(() => {
-                ghostInvincible.cdTimer--;
-                if(ghostInvincible.cdTimer > 0) {
-                    btn.innerText = `Hồi Bất Tử (${ghostInvincible.cdTimer}s)`;
-                } else {
-                    clearInterval(cd);
-                    btn.disabled = false;
-                    btn.innerText = "👻 Skill Bất Tử (15s)";
-                }
-            }, 1000);
-        }
-
-        function update() {
+        function updateGame() {
             if (moveState.up && player.y - player.radius > 0) player.y -= player.speed;
             if (moveState.down && player.y + player.radius < canvas.height) player.y += player.speed;
             if (moveState.left && player.x - player.radius > 0) player.x -= player.speed;
             if (moveState.right && player.x + player.radius < canvas.width) player.x += player.speed;
 
             npcs.forEach(npc => {
-                let dx = player.x - npc.x;
-                let dy = player.y - npc.y;
+                let dx = player.x - npc.x, dy = player.y - npc.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (alienShield.active) {
+                if (alienShield.active && userData.equipped === 'alien') {
                     if (dist < alienShield.radius + npc.radius) {
                         let angle = Math.atan2(dy, dx);
                         npc.x = player.x - Math.cos(angle) * (alienShield.radius + npc.radius);
@@ -340,85 +345,79 @@
                         return;
                     }
                 }
-
-                if (dist > 0) {
-                    npc.x += (dx / dist) * npc.speed;
-                    npc.y += (dy / dist) * npc.speed;
-                }
+                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
             });
         }
 
-        function draw() {
+        function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Vòng Năng Lượng
-            if (alienShield.active) {
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)';
-                ctx.fill();
-                ctx.strokeStyle = '#00ffcc';
-                ctx.lineWidth = 2;
-                ctx.stroke();
+            // Shield
+            if (alienShield.active && userData.equipped === 'alien') {
+                ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill();
+                ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
 
-            // 2. Nhân Vật
+            // Player
             ctx.save();
-            if (ghostInvincible.active) {
-                ctx.globalAlpha = 0.4;
-            }
+            if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
 
-            if (hasGhost) {
+            if (userData.equipped === 'ghost') {
                 ctx.fillStyle = '#ffffff';
-                ctx.beginPath();
-                ctx.arc(player.x, player.y - 2, player.radius, Math.PI, 0, false);
-                ctx.lineTo(player.x + player.radius, player.y + player.radius);
-                ctx.quadraticCurveTo(player.x + 4, player.y + 4, player.x, player.y + player.radius);
-                ctx.quadraticCurveTo(player.x - 4, player.y + 4, player.x - player.radius, player.y + player.radius);
-                ctx.lineTo(player.x - player.radius, player.y - 2);
-                ctx.fill();
-
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(player.x - 4, player.y - 3, 2, 0, Math.PI * 2);
-                ctx.arc(player.x + 4, player.y - 3, 2, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(player.x, player.y - 2, player.radius, Math.PI, 0, false);
+                ctx.lineTo(player.x + player.radius, player.y + player.radius); ctx.fill();
+            } else if (userData.equipped === 'alien') {
+                ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#a29bfe'; ctx.fill();
             } else {
-                ctx.beginPath();
-                ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#00ffcc';
-                ctx.fill();
-
-                ctx.fillStyle = '#000';
-                ctx.beginPath();
-                ctx.arc(player.x - 4, player.y - 3, 2, 0, Math.PI * 2);
-                ctx.arc(player.x + 4, player.y - 3, 2, 0, Math.PI * 2);
-                ctx.fill();
+                // Người Bình Thường (Vàng)
+                ctx.beginPath(); ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#f1c40f'; ctx.fill();
             }
+            
+            // Eyes
+            ctx.fillStyle = '#000'; ctx.beginPath();
+            ctx.arc(player.x - 4, player.y - 3, 2, 0, Math.PI * 2);
+            ctx.arc(player.x + 4, player.y - 3, 2, 0, Math.PI * 2); ctx.fill();
             ctx.restore();
 
-            // 3. NPC Kẻ Địch
+            // NPCs
             npcs.forEach(npc => {
-                ctx.beginPath();
-                ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#ff4757';
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#ff4757'; ctx.fill();
             });
         }
 
         let isRunning = false;
-        function gameLoop() {
-            update();
-            draw();
-            requestAnimationFrame(gameLoop);
+        function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
+        function initGame() { if (!isRunning) { isRunning = true; gameLoop(); } }
+
+        // --- CHAT & PVP ---
+        function sendChat() {
+            let inp = document.getElementById('chat-input');
+            if(!inp.value.trim()) return;
+            let box = document.getElementById('chat-messages');
+            box.innerHTML += `<div class="chat-msg"><span class="chat-user">${currentAccount}:</span> ${inp.value}</div>`;
+            inp.value = "";
+            box.scrollTop = box.scrollHeight;
         }
 
-        function initGame() {
-            if (!isRunning) {
-                isRunning = true;
-                gameLoop();
-            }
+        function startPVP() {
+            let res = document.getElementById('pvp-result');
+            res.innerText = "⚔️ Đang chiến đấu...";
+            setTimeout(() => {
+                let win = Math.random() > 0.5;
+                if(win) {
+                    userData.money += 1; saveData(); updateUI();
+                    res.innerText = "🎉 BẠN ĐÃ THẮNG! (+1 Xu)";
+                } else {
+                    res.innerText = "💀 BẠN ĐÃ THUA!";
+                }
+            }, 1500);
         }
+
+        function logout() { location.reload(); }
     </script>
 </body>
 </html>
