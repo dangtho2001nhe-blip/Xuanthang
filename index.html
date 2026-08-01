@@ -32,6 +32,7 @@
         .btn-success { background: #00b894; color: #fff; }
         .btn-danger { background: #e94560; color: #fff; }
         .btn-warning { background: #fdcb6e; color: #2d3436; }
+        .btn-music { background: linear-gradient(45deg, #a29bfe, #6c5ce7); color: #fff; }
         button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
 
         .hidden { display: none !important; }
@@ -74,7 +75,8 @@
 </head>
 <body>
 
-    <video id="catSkillVideo" src="trim.042206A4-3EA1-41F6-AFAA-D21291370998.MOV" playsinline muted style="display:none;"></video>
+    <video id="catSkillVideo" src="Cat.MOV" playsinline muted style="display:none;"></video>
+    <audio id="bgMusic" src="music.MOV" style="display:none;"></audio>
 
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
@@ -126,6 +128,7 @@
                 </div>
                 <div class="action-btns">
                     <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Không Có Skill</button>
+                    <button id="skill2Btn" class="btn-music hidden" onclick="useSkill2()" disabled>🎵 Phát Nhạc (300s)</button>
                     <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
                 </div>
             </div>
@@ -159,6 +162,13 @@
                     <div class="item-desc">Skill: Đẩy NPC Ra Xa (Hồi 6s)</div>
                 </div>
                 <button id="buy-witch-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('witch', 150)">150 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🎶 Âm Nhạc</div>
+                    <div class="item-desc">C1: Dịch chuyển xa NPC (23s)<br>C2: Phát nhạc (300s)</div>
+                </div>
+                <button id="buy-music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('music', 200)">200 Xu</button>
             </div>
         </div>
 
@@ -202,8 +212,9 @@
         let currentAccount = null;
         let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
 
-        // CANVASES XỬ LÝ XÓA NỀN TRẮNG CỦA VIDEO
+        // CANVASES XỬ LÝ XÓA NỀN TRẮNG CỦA VIDEO MÈO
         const catVideo = document.getElementById('catSkillVideo');
+        const bgMusic = document.getElementById('bgMusic');
         const processCanvas = document.createElement('canvas');
         const processCtx = processCanvas.getContext('2d');
 
@@ -301,11 +312,13 @@
             let bAlien = document.getElementById('buy-alien-btn');
             let bCat = document.getElementById('buy-cat-btn');
             let bWitch = document.getElementById('buy-witch-btn');
+            let bMusic = document.getElementById('buy-music-btn');
             
             if(userData.inventory.includes('ghost')) { bGhost.innerText = "Đã Có"; bGhost.disabled = true; }
             if(userData.inventory.includes('alien')) { bAlien.innerText = "Đã Có"; bAlien.disabled = true; }
             if(userData.inventory.includes('cat')) { bCat.innerText = "Đã Có"; bCat.disabled = true; }
             if(userData.inventory.includes('witch')) { bWitch.innerText = "Đã Có"; bWitch.disabled = true; }
+            if(userData.inventory.includes('music')) { bMusic.innerText = "Đã Có"; bMusic.disabled = true; }
         }
 
         function updateBaloUI() {
@@ -316,7 +329,8 @@
                 ghost: "👻 Con Ma (Bất Tử)", 
                 alien: "👾 Alien (Vòng Năng Lượng)", 
                 cat: "🐱 Mèo (Trảm 1 NPC Gần)",
-                witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)"
+                witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)",
+                music: "🎶 Âm Nhạc (Dịch Chuyển + Nhạc)"
             };
 
             userData.inventory.forEach(item => {
@@ -361,28 +375,44 @@
 
         // --- SKILL CONTROL ---
         let skillCD = false;
+        let skill2CD = false;
+
         function updateSkillButton() {
             let btn = document.getElementById('skillBtn');
-            if(!isGamePlaying) { btn.innerText = "🔒 Bấm Play Để Dùng"; btn.disabled = true; return; }
+            let btn2 = document.getElementById('skill2Btn');
+
+            if(!isGamePlaying) { 
+                btn.innerText = "🔒 Bấm Play Để Dùng"; btn.disabled = true; 
+                btn2.classList.add('hidden');
+                return; 
+            }
+
+            btn2.classList.add('hidden'); // Mặc định ẩn chiêu 2
 
             if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
             else if(userData.equipped === 'ghost') { btn.innerText = "👻 Bất Tử (15s)"; btn.disabled = skillCD; } 
             else if(userData.equipped === 'alien') { btn.innerText = "👾 Vòng Tròn (36s)"; btn.disabled = skillCD; } 
             else if(userData.equipped === 'cat') { btn.innerText = "🐱 Trảm NPC Gần (8s)"; btn.disabled = skillCD; }
             else if(userData.equipped === 'witch') { btn.innerText = "🪼 Đẩy NPC Ra Xa (6s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'music') {
+                btn.innerText = "✨ Dịch Chuyển (23s)"; btn.disabled = skillCD;
+                btn2.classList.remove('hidden');
+                btn2.innerText = "🎵 Phát Nhạc (300s)"; btn2.disabled = skill2CD;
+            }
         }
 
+        // Chiêu 1
         function useActiveSkill() {
             if(skillCD || !isGamePlaying) return;
 
             if(userData.equipped === 'ghost') {
                 ghostInvincible.active = true;
                 setTimeout(() => { ghostInvincible.active = false; }, 5000);
-                startCooldown(15);
+                startCooldown(15, 'skillBtn');
             } else if(userData.equipped === 'alien') {
                 alienShield.active = true;
                 setTimeout(() => { alienShield.active = false; }, 20000);
-                startCooldown(36);
+                startCooldown(36, 'skillBtn');
             } else if(userData.equipped === 'cat') {
                 if (npcs.length === 0) return;
                 let closestIndex = -1;
@@ -397,8 +427,6 @@
 
                 if (closestIndex !== -1) {
                     let targetNpc = npcs[closestIndex];
-                    
-                    // Phát video hoạt ảnh ngay tại vị trí NPC vừa bị tiêu diệt
                     catVideo.currentTime = 0;
                     catVideo.play().catch(e => console.log(e));
 
@@ -406,11 +434,11 @@
                         x: targetNpc.x,
                         y: targetNpc.y,
                         frame: 0,
-                        maxFrame: 45 // Thời gian hiển thị hoạt ảnh
+                        maxFrame: 45
                     });
 
                     npcs.splice(closestIndex, 1);
-                    startCooldown(8);
+                    startCooldown(8, 'skillBtn');
                 }
             } else if(userData.equipped === 'witch') {
                 npcs.forEach(npc => {
@@ -424,19 +452,69 @@
                     npc.x = Math.max(10, Math.min(canvas.width - 10, npc.x));
                     npc.y = Math.max(10, Math.min(canvas.height - 10, npc.y));
                 });
-                startCooldown(6);
+                startCooldown(6, 'skillBtn');
+            } else if(userData.equipped === 'music') {
+                // CHIÊU 1 MỚI: Dịch chuyển xa NPC nhất
+                if (npcs.length > 0) {
+                    let maxAvgDist = -1;
+                    let bestX = player.x, bestY = player.y;
+
+                    // Thử nghiệm các vị trí góc/cạnh bản đồ
+                    let testPoints = [
+                        {x: 20, y: 20}, {x: canvas.width - 20, y: 20},
+                        {x: 20, y: canvas.height - 20}, {x: canvas.width - 20, y: canvas.height - 20},
+                        {x: canvas.width / 2, y: 20}, {x: canvas.width / 2, y: canvas.height - 20},
+                        {x: 20, y: canvas.height / 2}, {x: canvas.width - 20, y: canvas.height / 2}
+                    ];
+
+                    testPoints.forEach(p => {
+                        let minDistToNpc = Infinity;
+                        npcs.forEach(npc => {
+                            let d = Math.sqrt((p.x - npc.x)**2 + (p.y - npc.y)**2);
+                            if (d < minDistToNpc) minDistToNpc = d;
+                        });
+
+                        if (minDistToNpc > maxAvgDist) {
+                            maxAvgDist = minDistToNpc;
+                            bestX = p.x;
+                            bestY = p.y;
+                        }
+                    });
+
+                    player.x = bestX;
+                    player.y = bestY;
+                }
+                startCooldown(23, 'skillBtn');
             }
         }
 
-        function startCooldown(seconds) {
-            skillCD = true;
-            let btn = document.getElementById('skillBtn');
+        // Chiêu 2 (Phát Nhạc cho nhân vật 🎶 Âm Nhạc)
+        function useSkill2() {
+            if(skill2CD || !isGamePlaying || userData.equipped !== 'music') return;
+
+            bgMusic.currentTime = 0;
+            bgMusic.play().catch(e => console.log(e));
+            startCooldown(300, 'skill2Btn');
+        }
+
+        function startCooldown(seconds, btnId) {
+            let isSkill1 = btnId === 'skillBtn';
+            if (isSkill1) skillCD = true;
+            else skill2CD = true;
+
+            let btn = document.getElementById(btnId);
             let timer = seconds;
             btn.disabled = true;
+            let originalText = isSkill1 ? (userData.equipped === 'music' ? "✨ Dịch Chuyển" : "SKILL") : "🎵 Phát Nhạc";
+
             let cd = setInterval(() => {
                 timer--;
                 if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
-                else { clearInterval(cd); skillCD = false; updateSkillButton(); }
+                else { 
+                    clearInterval(cd); 
+                    if (isSkill1) skillCD = false; else skill2CD = false;
+                    updateSkillButton(); 
+                }
             }, 1000);
         }
 
@@ -519,6 +597,7 @@
             document.getElementById('overlay-sub').innerText = subText;
             overlay.classList.remove('hidden');
             clearTimeout(coinSpawnTimer);
+            bgMusic.pause(); // Dừng nhạc khi thoát/dừng game
             updateSkillButton();
         }
 
@@ -592,20 +671,17 @@
         // VẼ HOẠT ẢNH VIDEO VÀ XÓA NỀN TRẮNG REALTIME TẠI TỌA ĐỘ NPC
         function drawSlashEffects() {
             if (catVideo.videoWidth > 0) {
-                // Đặt kích thước cho Canvas ẩn
                 processCanvas.width = catVideo.videoWidth;
                 processCanvas.height = catVideo.videoHeight;
                 
-                // Vẽ frame hiện tại của video vào Canvas ẩn
                 processCtx.drawImage(catVideo, 0, 0);
                 let imgData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
                 let data = imgData.data;
 
-                // Thuật toán quét và xóa nền trắng
                 for (let i = 0; i < data.length; i += 4) {
                     let r = data[i], g = data[i+1], b = data[i+2];
                     if (r > 200 && g > 200 && b > 200) {
-                        data[i + 3] = 0; // Biến màu trắng thành trong suốt
+                        data[i + 3] = 0;
                     }
                 }
                 processCtx.putImageData(imgData, 0, 0);
@@ -613,7 +689,7 @@
 
             slashEffects.forEach((eff) => {
                 ctx.save();
-                let size = 50; // Kích thước hiển thị hoạt ảnh
+                let size = 50;
                 ctx.drawImage(processCanvas, eff.x - size / 2, eff.y - size / 2, size, size);
                 ctx.restore();
                 eff.frame++;
@@ -637,10 +713,10 @@
                 ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
 
-            // 3. Vẽ Hoạt Ảnh Video Mèo (Đã xóa nền trắng)
+            // 3. Vẽ Hoạt Ảnh Video Mèo
             drawSlashEffects();
 
-            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼' };
+            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼', music: '🎶' };
 
             // 4. Vẽ Người Chơi Chính
             ctx.save();
