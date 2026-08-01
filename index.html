@@ -3,272 +3,652 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Game Online Đa Năng</title>
+    <title>Super Cyber Game - Real-time Online Full</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-        body { font-family: Arial, sans-serif; background: #1a1a1a; color: #fff; text-align: center; overflow: hidden; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
+        body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
-        .screen { display: none; width: 100vw; height: 100vh; flex-direction: column; justify-content: center; align-items: center; position: absolute; top: 0; left: 0; }
-        .active { display: flex; }
+        .card { 
+            background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; 
+            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); border: 1px solid rgba(0, 255, 245, 0.3); position: relative;
+        }
 
-        input, button { padding: 12px 20px; margin: 8px; font-size: 16px; border-radius: 8px; border: none; outline: none; }
-        input { background: #333; color: #fff; border: 1px solid #555; width: 250px; text-align: center; }
-        button { background: #4CAF50; color: white; font-weight: bold; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.95); }
+        h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
         
-        /* Game UI */
-        #gameCanvas { background: #222; display: block; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
-        #ui-bar { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-        .ui-element { background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 20px; font-weight: bold; }
+        /* Navigation Tabs */
+        .nav-bar { display: flex; gap: 4px; margin-bottom: 12px; background: #0f172a; padding: 4px; border-radius: 12px; }
+        .nav-btn { flex: 1; padding: 7px 2px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
-        /* Shop UI */
-        .shop-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 600px; }
-        .card { background: #2a2a2a; border: 2px solid #444; border-radius: 12px; padding: 15px; width: 160px; display: flex; flex-direction: column; align-items: center; }
-        .card h3 { margin-bottom: 10px; color: #ffca28; }
-
-        /* Skill Button */
-        #skillBtn { position: absolute; bottom: 20px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: #ff9800; color: white; font-size: 14px; font-weight: bold; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        /* General Inputs & Buttons */
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-group label { display: block; font-size: 11px; color: #a29bfe; margin-bottom: 4px; }
+        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: #0f172a; color: #fff; outline: none; }
         
-        /* Chat UI */
-        #chat-box { position: absolute; bottom: 20px; left: 20px; width: 250px; pointer-events: auto; }
-        #chat-messages { height: 100px; overflow-y: auto; background: rgba(0,0,0,0.5); border-radius: 8px; padding: 5px; font-size: 12px; text-align: left; margin-bottom: 5px; }
+        button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.98); }
+        .btn-primary { background: linear-gradient(45deg, #00fff5, #00a8ff); color: #0a0a16; }
+        .btn-success { background: #00b894; color: #fff; }
+        .btn-danger { background: #e94560; color: #fff; }
+        .btn-warning { background: #fdcb6e; color: #2d3436; }
+        button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
+
+        .hidden { display: none !important; }
+        .money-box { font-size: 14px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+
+        /* Canvas Game & Overlay Menu */
+        .canvas-container { position: relative; width: 100%; height: 200px; margin-bottom: 8px; }
+        canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 100%; display: block; }
+        
+        .game-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 11, 20, 0.9); border-radius: 12px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+
+        /* D-Pad Controls */
+        .controls-container { display: flex; justify-content: space-between; align-items: center; }
+        .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
+        .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 14px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+        .dpad-up { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-down { grid-column: 2; grid-row: 3; }
+        .action-btns { width: 55%; display: flex; flex-direction: column; gap: 4px; }
+
+        /* Item Cards & Room Info */
+        .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .item-info { text-align: left; }
+        .item-title { font-weight: bold; color: #00fff5; font-size: 13px; }
+        .item-desc { font-size: 11px; color: #aaa; }
+        
+        .room-box { background: #0f172a; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px dashed #00fff5; text-align: center; }
+
+        /* Chat Box */
+        .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 180px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 12px; margin-bottom: 8px; }
+        .chat-msg { margin-bottom: 5px; word-break: break-all; }
+        .chat-user { color: #00fff5; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <!-- Màn hình Đăng nhập -->
-    <div id="authScreen" class="screen active">
-        <h2>🎮 ĐĂNG NHẬP / ĐĂNG KÝ</h2>
-        <input type="text" id="username" placeholder="Tên tài khoản...">
-        <input type="password" id="password" placeholder="Mật khẩu...">
-        <button onclick="login()">Vào Game</button>
+    <!-- AUTH PANEL -->
+    <div id="auth-panel" class="card">
+        <h2>CYBER WORLD</h2>
+        <div class="input-group">
+            <label>Tài Khoản</label>
+            <input type="text" id="username" placeholder="Nhập tên...">
+        </div>
+        <div class="input-group">
+            <label>Mật Khẩu</label>
+            <input type="password" id="password" placeholder="Nhập mật khẩu...">
+        </div>
+        <button class="btn-primary" onclick="handleAuth('login')">ĐĂNG NHẬP</button>
+        <button class="btn-success" onclick="handleAuth('register')">ĐĂNG KÝ</button>
+        <p id="status" style="font-size: 12px; color: #ff4757;"></p>
     </div>
 
-    <!-- Màn hình Menu / Shop -->
-    <div id="menuScreen" class="screen">
-        <h2>SẢNH CHỜ</h2>
-        <p id="userStats" style="margin: 10px 0; color: #ffd700;"></p>
+    <!-- MAIN GAME PANEL -->
+    <div id="game-panel" class="card hidden">
+        <div class="money-box">
+            <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
+            <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
+        </div>
         
-        <div style="margin: 10px 0;">
-            <input type="text" id="giftcode" placeholder="Nhập mã Giftcode..." style="width: 180px;">
-            <button onclick="claimCode()">Nhận Code</button>
+        <!-- NAV BAR -->
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
+            <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
+            <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
+            <button class="nav-btn" onclick="switchPage('code')">CODE</button>
+            <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
+            <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
         </div>
 
-        <div class="shop-container">
-            <div class="card">
-                <h3>Chiến Binh ⚔️</h3>
-                <p>Kỹ năng: Bất tử 3s</p>
-                <button onclick="selectChar('warrior')">Chọn</button>
+        <!-- 1. PLAY TAB -->
+        <div id="tab-play" class="page-tab">
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="360" height="200"></canvas>
+                
+                <div id="menu-overlay" class="game-overlay">
+                    <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
+                    <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
+                    <button id="start-game-btn" class="btn-primary" style="width: 150px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
+                </div>
             </div>
-            <div class="card">
-                <h3>Phù Thủy 🪼</h3>
-                <p>Kỹ năng: Đẩy NPC ra xa</p>
-                <button onclick="selectChar('witch')">Chọn</button>
+
+            <div class="controls-container">
+                <div class="dpad">
+                    <div class="dpad-btn dpad-up" ontouchstart="startMove('up')" ontouchend="stopMove('up')" onmousedown="startMove('up')" onmouseup="stopMove('up')">▲</div>
+                    <div class="dpad-btn dpad-left" ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')">◀</div>
+                    <div class="dpad-btn dpad-right" ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')">▶</div>
+                    <div class="dpad-btn dpad-down" ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')">▼</div>
+                </div>
+                <div class="action-btns">
+                    <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Không Có Skill</button>
+                    <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
+                </div>
             </div>
         </div>
-        <br>
-        <button onclick="startGame()" style="background: #e91e63; font-size: 18px;">VÀO TRẬN 🚀</button>
-    </div>
 
-    <!-- Màn hình Game -->
-    <div id="gameScreen" class="screen">
-        <div id="ui-bar">
-            <div class="ui-element" id="coinDisplay">💰 Coin: 0</div>
-            <div class="ui-element" id="charDisplay">🎭 NV: Phù thủy 🪼</div>
+        <!-- 2. SHOP TAB -->
+        <div id="tab-shop" class="page-tab hidden">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">👻 Con Ma</div>
+                    <div class="item-desc">Skill: Bất tử 5s (Hồi 15s)</div>
+                </div>
+                <button id="buy-ghost-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('ghost', 50)">50 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">👾 Alien</div>
+                    <div class="item-desc">Skill: Vòng Năng Lượng 20s</div>
+                </div>
+                <button id="buy-alien-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('alien', 80)">80 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🐱 Mèo</div>
+                    <div class="item-desc">Skill: Vồ Chết 1 NPC Gần Nhất</div>
+                </div>
+                <button id="buy-cat-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('cat', 123)">123 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🪼 Phù Thủy</div>
+                    <div class="item-desc">Skill: Đẩy NPC Ra Xa (Hồi 6s)</div>
+                </div>
+                <button id="buy-witch-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('witch', 150)">150 Xu</button>
+            </div>
         </div>
 
-        <canvas id="gameCanvas" width="800" height="450"></canvas>
-
-        <div id="skillBtn" onclick="useSkill()">KỸ NĂNG</div>
-
-        <div id="chat-box">
-            <div id="chat-messages"></div>
-            <input type="text" id="chatInput" placeholder="Chat..." style="width: 100%; margin:0;" onkeypress="handleChat(event)">
+        <!-- 3. BALO TAB -->
+        <div id="tab-balo" class="page-tab hidden">
+            <div id="inventory-list"></div>
         </div>
+
+        <!-- 4. GIFTCODE TAB -->
+        <div id="tab-code" class="page-tab hidden">
+            <div class="room-box">
+                <p style="font-size: 12px; color: #00fff5; margin-bottom: 8px;">NHẬP MÃ QUÀ TẶNG GIFTCODE</p>
+                <input type="text" id="giftcode-input" placeholder="Nhập mã tại đây..." style="text-align: center; font-weight: bold;">
+                <button class="btn-success" onclick="claimCode()">NHẬN QUÀ</button>
+            </div>
+        </div>
+
+        <!-- 5. ONLINE MULTIPLAYER REAL-TIME TAB -->
+        <div id="tab-pvp" class="page-tab hidden">
+            <div class="room-box">
+                <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
+                <b id="my-peer-id" style="color: #00fff5; font-size: 14px; word-break: break-all;">Đang lấy mã...</b>
+            </div>
+
+            <p style="font-size: 12px; color: #00fff5; text-align: left; margin: 5px 0;">Nhập Mã ID Bạn Bè Để Đấu Online 2 Người:</p>
+            <input type="text" id="join-id-input" placeholder="Dán Mã ID đối thủ vào đây...">
+            <button class="btn-success" onclick="joinOnlineRoom()">⚔️ KẾT NỐI VÀO TRẬN ONLINE</button>
+            <p id="net-status" style="font-size: 11px; color: #f1c40f; margin-top: 8px;">Trạng thái: Chưa kết nối</p>
+        </div>
+
+        <!-- 6. CHAT TAB -->
+        <div id="tab-chat" class="page-tab hidden">
+            <div class="chat-box" id="chat-messages">
+                <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Chào mừng tới phòng chat thế giới!</div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
+                <button class="btn-primary" style="width: 80px; margin: 0;" onclick="sendChat()">GỬI</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // State Game
-        let userData = { username: "", coins: 0, char: "witch", claimedCodes: [] };
-        let canvas = document.getElementById("gameCanvas");
-        let ctx = canvas.getContext("2d");
-        
-        let player = { x: 100, y: 225, radius: 15, speed: 4, isInvincible: false, color: '#e91e63' };
-        let npcs = [];
-        let keys = {};
-        let skillCooldown = false;
+        let currentAccount = null;
+        let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
 
-        // Xử lý Tài khoản & Giftcode
-        function login() {
-            let user = document.getElementById("username").value.trim();
-            if (!user) return alert("Vui lòng nhập tên!");
-            
-            let saved = localStorage.getItem("game_user_" + user);
-            if (saved) {
-                userData = JSON.parse(saved);
-            } else {
-                userData.username = user;
-                saveData();
+        // --- GHI NHỚ ĐĂNG NHẬP TỰ ĐỘNG ---
+        window.onload = function() {
+            let savedAccount = localStorage.getItem('last_logged_user');
+            if(savedAccount) {
+                let data = localStorage.getItem('acc_' + savedAccount);
+                if(data) {
+                    currentAccount = savedAccount;
+                    userData = JSON.parse(data);
+                    if(!userData.claimedCodes) userData.claimedCodes = [];
+                    document.getElementById('auth-panel').classList.add('hidden');
+                    document.getElementById('game-panel').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = savedAccount;
+                    updateUI();
+                    initGameEngine();
+                    initPeerJS();
+                }
             }
-            showScreen("menuScreen");
-            updateMenuUI();
+        };
+
+        // --- AUTH ---
+        function handleAuth(type) {
+            let u = document.getElementById('username').value.trim();
+            let p = document.getElementById('password').value.trim();
+            let st = document.getElementById('status');
+            if(!u || !p) return st.innerText = "Chưa nhập thông tin!";
+
+            if(type === 'register') {
+                if(localStorage.getItem('acc_' + u)) return st.innerText = "Tài khoản đã tồn tại!";
+                let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
+                localStorage.setItem('acc_' + u, JSON.stringify(newData));
+                st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công!";
+            } else {
+                let data = localStorage.getItem('acc_' + u);
+                if(!data) return st.innerText = "Tài khoản không tồn tại!";
+                let parsed = JSON.parse(data);
+                if(parsed.pass !== p) return st.innerText = "Sai mật khẩu!";
+                
+                currentAccount = u;
+                userData = parsed;
+                if(!userData.claimedCodes) userData.claimedCodes = [];
+                localStorage.setItem('last_logged_user', u);
+
+                document.getElementById('auth-panel').classList.add('hidden');
+                document.getElementById('game-panel').classList.remove('hidden');
+                document.getElementById('user-display').innerText = u;
+                updateUI();
+                initGameEngine();
+                initPeerJS();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('last_logged_user');
+            location.reload();
         }
 
         function saveData() {
-            localStorage.setItem("game_user_" + userData.username, JSON.stringify(userData));
+            if(currentAccount) localStorage.setItem('acc_' + currentAccount, JSON.stringify(userData));
         }
 
-        function updateMenuUI() {
-            document.getElementById("userStats").innerText = `Tài khoản: ${userData.username} | Số Coin: ${userData.coins}`;
+        function updateUI() {
+            document.getElementById('money-display').innerText = userData.money;
+            updateShopUI();
+            updateBaloUI();
+            updateSkillButton();
         }
 
+        // --- NAVIGATION ---
+        function switchPage(page) {
+            document.querySelectorAll('.page-tab').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + page).classList.remove('hidden');
+            event.target.classList.add('active');
+            
+            if(page !== 'play') stopGameSession('SẢNH CHỜ');
+        }
+
+        // --- SHOP & BALO ---
+        function buyItem(item, price) {
+            if(userData.inventory.includes(item)) return alert("Bạn đã có nhân vật này!");
+            if(userData.money < price) return alert("Không đủ xu!");
+            
+            userData.money -= price;
+            userData.inventory.push(item);
+            saveData();
+            updateUI();
+            alert("Mua thành công!");
+        }
+
+        function updateShopUI() {
+            let bGhost = document.getElementById('buy-ghost-btn');
+            let bAlien = document.getElementById('buy-alien-btn');
+            let bCat = document.getElementById('buy-cat-btn');
+            let bWitch = document.getElementById('buy-witch-btn');
+            
+            if(userData.inventory.includes('ghost')) { bGhost.innerText = "Đã Có"; bGhost.disabled = true; }
+            if(userData.inventory.includes('alien')) { bAlien.innerText = "Đã Có"; bAlien.disabled = true; }
+            if(userData.inventory.includes('cat')) { bCat.innerText = "Đã Có"; bCat.disabled = true; }
+            if(userData.inventory.includes('witch')) { bWitch.innerText = "Đã Có"; bWitch.disabled = true; }
+        }
+
+        function updateBaloUI() {
+            let list = document.getElementById('inventory-list');
+            list.innerHTML = "";
+            const names = { 
+                human: "🧍 Người Bình Thường", 
+                ghost: "👻 Con Ma (Bất Tử)", 
+                alien: "👾 Alien (Vòng Năng Lượng)", 
+                cat: "🐱 Mèo (Trảm 1 NPC Gần)",
+                witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)"
+            };
+
+            userData.inventory.forEach(item => {
+                let isEquipped = userData.equipped === item;
+                list.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-title">${names[item]}</div>
+                            <div class="item-desc">${isEquipped ? '🟢 Đang Trang Bị' : '⚪ Trong Balo'}</div>
+                        </div>
+                        <button class="${isEquipped ? 'btn-success' : 'btn-primary'}" style="width: 90px;" ${isEquipped ? 'disabled' : ''} onclick="equipItem('${item}')">
+                            ${isEquipped ? 'ĐANG DÙNG' : 'TRANG BỊ'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function equipItem(item) {
+            userData.equipped = item;
+            saveData();
+            updateUI();
+        }
+
+        // --- GIFTCODE ---
         function claimCode() {
-            let code = document.getElementById("giftcode").value.trim();
-            if (code === "12345") {
-                if (userData.claimedCodes.includes("12345")) {
-                    alert("Bạn đã nhập mã này rồi!");
+            let code = document.getElementById('giftcode-input').value.trim();
+            if(code === "12345") {
+                if(userData.claimedCodes.includes("12345")) {
+                    alert("Bạn đã nhập mã quà tặng này rồi!");
                 } else {
-                    userData.coins += 132;
+                    userData.money += 132;
                     userData.claimedCodes.push("12345");
                     saveData();
-                    updateMenuUI();
-                    alert("Nhập mã thành công! Bạn nhận được +132 Coin 🪙");
-                    document.getElementById("giftcode").value = "";
+                    updateUI();
+                    alert("🎉 Nhập mã thành công! Bạn nhận được +132 Coin!");
+                    document.getElementById('giftcode-input').value = "";
                 }
             } else {
-                alert("Mã quà tặng không hợp lệ!");
+                alert("Mã quà tặng không đúng!");
             }
         }
 
-        function selectChar(charType) {
-            userData.char = charType;
-            saveData();
-            alert("Đã chọn nhân vật: " + (charType === 'witch' ? "Phù Thủy 🪼" : "Chiến Binh ⚔️"));
+        // --- SKILL CONTROL ---
+        let skillCD = false;
+        function updateSkillButton() {
+            let btn = document.getElementById('skillBtn');
+            if(!isGamePlaying) { btn.innerText = "🔒 Bấm Play Để Dùng"; btn.disabled = true; return; }
+
+            if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
+            else if(userData.equipped === 'ghost') { btn.innerText = "👻 Bất Tử (15s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'alien') { btn.innerText = "👾 Vòng Tròn (36s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'cat') { btn.innerText = "🐱 Trảm NPC Gần (8s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'witch') { btn.innerText = "🪼 Đẩy NPC Ra Xa (6s)"; btn.disabled = skillCD; }
         }
 
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-        }
+        function useActiveSkill() {
+            if(skillCD || !isGamePlaying) return;
 
-        // Vào Game
-        function startGame() {
-            showScreen("gameScreen");
-            document.getElementById("charDisplay").innerText = "🎭 NV: " + (userData.char === 'witch' ? "Phù Thủy 🪼" : "Chiến Binh ⚔️");
-            document.getElementById("coinDisplay").innerText = "💰 Coin: " + userData.coins;
-            
-            // Khởi tạo NPC
-            npcs = [];
-            for(let i = 0; i < 8; i++) {
-                npcs.push({
-                    x: Math.random() * (canvas.width - 100) + 50,
-                    y: Math.random() * (canvas.height - 100) + 50,
-                    vx: (Math.random() - 0.5) * 2,
-                    vy: (Math.random() - 0.5) * 2,
-                    radius: 12
+            if(userData.equipped === 'ghost') {
+                ghostInvincible.active = true;
+                setTimeout(() => { ghostInvincible.active = false; }, 5000);
+                startCooldown(15);
+            } else if(userData.equipped === 'alien') {
+                alienShield.active = true;
+                setTimeout(() => { alienShield.active = false; }, 20000);
+                startCooldown(36);
+            } else if(userData.equipped === 'cat') {
+                if (npcs.length === 0) return;
+                let closestIndex = -1;
+                let minDist = Infinity;
+
+                npcs.forEach((npc, index) => {
+                    let dx = player.x - npc.x;
+                    let dy = player.y - npc.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < minDist) { minDist = dist; closestIndex = index; }
                 });
-            }
 
-            requestAnimationFrame(gameLoop);
-        }
-
-        // Điều khiển Di chuyển
-        window.addEventListener("keydown", e => keys[e.key] = true);
-        window.addEventListener("keyup", e => keys[e.key] = false);
-
-        function updatePlayer() {
-            if (keys['w'] || keys['ArrowUp']) player.y -= player.speed;
-            if (keys['s'] || keys['ArrowDown']) player.y += player.speed;
-            if (keys['a'] || keys['ArrowLeft']) player.x -= player.speed;
-            if (keys['d'] || keys['ArrowRight']) player.x += player.speed;
-
-            // Giới hạn màn hình
-            player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
-            player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
-        }
-
-        // Kỹ năng Phù thủy (Đẩy NPC ra xa) / Chiến Binh (Bất tử)
-        function useSkill() {
-            if (skillCooldown) return;
-            skillCooldown = true;
-            document.getElementById("skillBtn").style.opacity = "0.5";
-
-            if (userData.char === 'witch') {
-                // Kỹ năng Phù thủy: Đẩy tất cả NPC ra xa khỏi vị trí người chơi
+                if (closestIndex !== -1) {
+                    let targetNpc = npcs[closestIndex];
+                    slashEffects.push({ x: targetNpc.x, y: targetNpc.y, frame: 0, maxFrame: 15 });
+                    npcs.splice(closestIndex, 1);
+                    startCooldown(8);
+                }
+            } else if(userData.equipped === 'witch') {
+                // Kỹ năng Phù Thủy: Đẩy NPC ra xa vị trí hiện tại
                 npcs.forEach(npc => {
                     let dx = npc.x - player.x;
                     let dy = npc.y - player.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (dist === 0) { dx = 1; dist = 1; } // Tránh chia cho 0
-                    
-                    // Lực đẩy cực mạnh đẩy NPC ra phía biên màn hình
-                    let pushForce = 300; 
-                    npc.x += (dx / dist) * pushForce;
-                    npc.y += (dy / dist) * pushForce;
-
-                    // Giữ NPC trong khung hình canvas
-                    npc.x = Math.max(npc.radius, Math.min(canvas.width - npc.radius, npc.x));
-                    npc.y = Math.max(npc.radius, Math.min(canvas.height - npc.radius, npc.y));
+                    if(dist === 0) dist = 1;
+                    let pushDistance = 120;
+                    npc.x += (dx / dist) * pushDistance;
+                    npc.y += (dy / dist) * pushDistance;
+                    npc.x = Math.max(10, Math.min(canvas.width - 10, npc.x));
+                    npc.y = Math.max(10, Math.min(canvas.height - 10, npc.y));
                 });
-            } else {
-                // Kỹ năng Chiến binh: Bất tử 3s
-                player.isInvincible = true;
-                setTimeout(() => { player.isInvincible = false; }, 3000);
+                startCooldown(6);
             }
-
-            // Cooldown 5s
-            setTimeout(() => {
-                skillCooldown = false;
-                document.getElementById("skillBtn").style.opacity = "1";
-            }, 5000);
         }
 
-        // Game Loop
-        function gameLoop() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        function startCooldown(seconds) {
+            skillCD = true;
+            let btn = document.getElementById('skillBtn');
+            let timer = seconds;
+            btn.disabled = true;
+            let cd = setInterval(() => {
+                timer--;
+                if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
+                else { clearInterval(cd); skillCD = false; updateSkillButton(); }
+            }, 1000);
+        }
 
-            updatePlayer();
+        // --- GAME ENGINE & MULTIPLAYER ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let moveState = { up: false, down: false, left: false, right: false };
+        
+        let player = { x: 180, y: 100, radius: 10, speed: 2.2 };
+        let remotePlayer = { x: -100, y: -100, active: false, equipped: 'human' };
 
-            // Vẽ Player
-            ctx.beginPath();
-            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
-            ctx.fillStyle = player.isInvincible ? "#00ffff" : (userData.char === 'witch' ? "#9c27b0" : "#e91e63");
-            ctx.fill();
-            ctx.closePath();
+        let alienShield = { active: false, radius: 45 };
+        let ghostInvincible = { active: false };
+        let slashEffects = [];
+        let npcs = [];
+        let droppedCoins = [];
+        let isGamePlaying = false;
+        let coinSpawnTimer = null;
 
-            // Cập nhật & Vẽ NPCs
-            npcs.forEach(npc => {
-                npc.x += npc.vx;
-                npc.y += npc.vy;
+        // --- KẾT NỐI PEERJS ---
+        let peer = null;
+        let conn = null;
 
-                // Nảy tường
-                if (npc.x - npc.radius < 0 || npc.x + npc.radius > canvas.width) npc.vx *= -1;
-                if (npc.y - npc.radius < 0 || npc.y + npc.radius > canvas.height) npc.vy *= -1;
+        function initPeerJS() {
+            peer = new Peer();
+            peer.on('open', (id) => {
+                document.getElementById('my-peer-id').innerText = id;
+            });
+            peer.on('connection', (connection) => {
+                conn = connection;
+                setupNetworkEvents();
+                document.getElementById('net-status').innerText = "🟢 Đã kết nối với Đối thủ!";
+                alert("🎉 Có người vừa kết nối đấu Online với bạn!");
+            });
+        }
 
-                ctx.beginPath();
-                ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2);
-                ctx.fillStyle = "#ff5722";
-                ctx.fill();
-                ctx.closePath();
+        function joinOnlineRoom() {
+            let targetId = document.getElementById('join-id-input').value.trim();
+            if(!targetId) return alert("Vui lòng nhập Mã ID!");
+
+            conn = peer.connect(targetId);
+            setupNetworkEvents();
+            document.getElementById('net-status').innerText = "🟢 Đã kết nối vào trận thành công!";
+            switchPage('play');
+            startGameSession();
+        }
+
+        function setupNetworkEvents() {
+            remotePlayer.active = true;
+            conn.on('data', (data) => {
+                remotePlayer.x = data.x;
+                remotePlayer.y = data.y;
+                remotePlayer.equipped = data.equipped;
+            });
+        }
+
+        function startMove(d) { if(isGamePlaying) moveState[d] = true; }
+        function stopMove(d) { moveState[d] = false; }
+
+        function startGameSession() {
+            isGamePlaying = true;
+            player.x = 180; player.y = 100;
+            droppedCoins = [];
+            slashEffects = [];
+            document.getElementById('menu-overlay').classList.add('hidden');
+            
+            npcs = [];
+            let count = Math.floor(Math.random() * 3) + 2;
+            for(let i = 0; i < count; i++) {
+                npcs.push({ x: Math.random() * (canvas.width - 20) + 10, y: Math.random() * (canvas.height - 20) + 10, radius: 8, speed: 0.9 + Math.random() * 0.3 });
+            }
+            scheduleNextCoin();
+            updateSkillButton();
+        }
+
+        function stopGameSession(titleText = 'SẢNH CHỜ', subText = '') {
+            isGamePlaying = false;
+            let overlay = document.getElementById('menu-overlay');
+            document.getElementById('overlay-title').innerText = titleText;
+            document.getElementById('overlay-sub').innerText = subText;
+            overlay.classList.remove('hidden');
+            clearTimeout(coinSpawnTimer);
+            updateSkillButton();
+        }
+
+        function scheduleNextCoin() {
+            if(!isGamePlaying) return;
+            let time = (Math.floor(Math.random() * 4) + 3) * 1000;
+            coinSpawnTimer = setTimeout(() => {
+                if(isGamePlaying) {
+                    droppedCoins.push({ x: Math.random() * (canvas.width - 40) + 20, y: Math.random() * (canvas.height - 40) + 20, value: Math.floor(Math.random() * 26) + 1 });
+                    scheduleNextCoin();
+                }
+            }, time);
+        }
+
+        function updateGame() {
+            if(!isGamePlaying) return;
+            let moved = false;
+
+            if (moveState.up && player.y - player.radius > 0) { player.y -= player.speed; moved = true; }
+            if (moveState.down && player.y + player.radius < canvas.height) { player.y += player.speed; moved = true; }
+            if (moveState.left && player.x - player.radius > 0) { player.x -= player.speed; moved = true; }
+            if (moveState.right && player.x + player.radius < canvas.width) { player.x += player.speed; moved = true; }
+
+            if(moved && conn && conn.open) {
+                conn.send({ x: player.x, y: player.y, equipped: userData.equipped });
+            }
+
+            // Ăn Xu
+            droppedCoins = droppedCoins.filter(coin => {
+                let dx = player.x - coin.x, dy = player.y - coin.y;
+                if(Math.sqrt(dx * dx + dy * dy) < player.radius + 10) {
+                    userData.money += coin.value; saveData(); updateUI(); return false;
+                }
+                return true;
             });
 
-            requestAnimationFrame(gameLoop);
+            // NPC di chuyển
+            npcs.forEach(npc => {
+                let target = player;
+                let minDist = Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2);
+
+                if(remotePlayer.active) {
+                    let d = Math.sqrt((remotePlayer.x - npc.x)**2 + (remotePlayer.y - npc.y)**2);
+                    if(d < minDist) { minDist = d; target = remotePlayer; }
+                }
+
+                let dx = target.x - npc.x, dy = target.y - npc.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (alienShield.active && userData.equipped === 'alien') {
+                    if (dist < alienShield.radius + npc.radius) {
+                        let angle = Math.atan2(dy, dx);
+                        npc.x = target.x - Math.cos(angle) * (alienShield.radius + npc.radius);
+                        npc.y = target.y - Math.sin(angle) * (alienShield.radius + npc.radius);
+                        return;
+                    }
+                }
+
+                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
+
+                // Va chạm NPC = Chết
+                if (Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2) < player.radius + npc.radius) {
+                    if (!(ghostInvincible.active && userData.equipped === 'ghost')) {
+                        stopGameSession('💀 BẠN ĐÃ CHẾT!');
+                        return;
+                    }
+                }
+            });
         }
 
-        // Chat
-        function handleChat(e) {
-            if (e.key === 'Enter') {
-                let input = document.getElementById("chatInput");
-                if (input.value.trim() !== "") {
-                    let msgBox = document.getElementById("chatMessages");
-                    let p = document.createElement("div");
-                    p.innerText = userData.username + ": " + input.value;
-                    msgBox.appendChild(p);
-                    msgBox.scrollTop = msgBox.scrollHeight;
-                    input.value = "";
-                }
+        // VẼ HIỆU ỨNG TRẢM CỦA MÈO
+        function drawSlashEffects() {
+            slashEffects.forEach((eff) => {
+                ctx.save();
+                ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3; ctx.shadowColor = '#ff2e93'; ctx.shadowBlur = 10;
+                let size = 18;
+                ctx.beginPath();
+                ctx.moveTo(eff.x - size, eff.y - size); ctx.lineTo(eff.x + size, eff.y + size);
+                ctx.moveTo(eff.x - size + 6, eff.y - size - 4); ctx.lineTo(eff.x + size + 6, eff.y + size - 4);
+                ctx.moveTo(eff.x - size - 6, eff.y - size + 4); ctx.lineTo(eff.x + size - 6, eff.y + size + 4);
+                ctx.stroke();
+                ctx.restore();
+                eff.frame++;
+            });
+            slashEffects = slashEffects.filter(eff => eff.frame < eff.maxFrame);
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 1. Vẽ Xu
+            droppedCoins.forEach(coin => {
+                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
+            });
+
+            // 2. Vẽ Vòng Alien
+            if (alienShield.active && userData.equipped === 'alien') {
+                ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
+
+            // 3. Vẽ Hoạt Ảnh Trảm NPC
+            drawSlashEffects();
+
+            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼' };
+
+            // 4. Vẽ Người Chơi Chính
+            ctx.save();
+            if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
+            ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(icons[userData.equipped] || '🧍', player.x, player.y);
+            ctx.restore();
+
+            // 5. Vẽ Đối Thủ Online
+            if(remotePlayer.active) {
+                ctx.fillText(icons[remotePlayer.equipped] || '🧍', remotePlayer.x, remotePlayer.y);
+                ctx.font = '9px Arial'; ctx.fillStyle = '#e94560';
+                ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
+            }
+
+            // 6. Vẽ NPC Địch (Quái Đỏ)
+            npcs.forEach(npc => {
+                ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
+            });
+        }
+
+        let isEngineRunning = false;
+        function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
+        function initGameEngine() { if (!isEngineRunning) { isEngineRunning = true; gameLoop(); } }
+
+        // --- CHAT ---
+        function sendChat() {
+            let inp = document.getElementById('chat-input');
+            if(!inp.value.trim()) return;
+            let box = document.getElementById('chat-messages');
+            box.innerHTML += `<div class="chat-msg"><span class="chat-user">${currentAccount}:</span> ${inp.value}</div>`;
+            inp.value = ""; box.scrollTop = box.scrollHeight;
         }
     </script>
 </body>
