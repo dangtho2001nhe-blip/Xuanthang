@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Cyber Game - Real-time Online Full</title>
+    <title>Super Cyber Game - Multi-Device (Mobile, PC, Smart TV)</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
         body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
         .card { 
-            background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; 
+            background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; 
             box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); border: 1px solid rgba(0, 255, 245, 0.3); position: relative;
         }
 
@@ -27,29 +27,29 @@
         input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: #0f172a; color: #fff; outline: none; }
         
         button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        button:active { transform: scale(0.98); }
+        button:active, button:focus { transform: scale(0.98); outline: 2px solid #00fff5; }
         .btn-primary { background: linear-gradient(45deg, #00fff5, #00a8ff); color: #0a0a16; }
         .btn-success { background: #00b894; color: #fff; }
         .btn-danger { background: #e94560; color: #fff; }
         .btn-warning { background: #fdcb6e; color: #2d3436; }
         .btn-music { background: linear-gradient(45deg, #a29bfe, #6c5ce7); color: #fff; }
-        button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
+        button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; outline: none !important; }
 
         .hidden { display: none !important; }
         .money-box { font-size: 14px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         /* Canvas Game & Overlay Menu */
-        .canvas-container { position: relative; width: 100%; height: 200px; margin-bottom: 8px; }
+        .canvas-container { position: relative; width: 100%; height: 210px; margin-bottom: 8px; }
         canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 100%; display: block; }
         
         .game-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 11, 20, 0.9); border-radius: 12px;
+            background: rgba(5, 11, 20, 0.92); border-radius: 12px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10;
         }
 
-        /* D-Pad Controls */
+        /* Controls */
         .controls-container { display: flex; justify-content: space-between; align-items: center; }
         .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
         .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 14px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
@@ -57,7 +57,7 @@
         .dpad-left { grid-column: 1; grid-row: 2; }
         .dpad-right { grid-column: 3; grid-row: 2; }
         .dpad-down { grid-column: 2; grid-row: 3; }
-        .action-btns { width: 55%; display: flex; flex-direction: column; gap: 4px; }
+        .action-btns { width: 58%; display: flex; flex-direction: column; gap: 4px; }
 
         /* Item Cards & Room Info */
         .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
@@ -71,6 +71,8 @@
         .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 180px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 12px; margin-bottom: 8px; }
         .chat-msg { margin-bottom: 5px; word-break: break-all; }
         .chat-user { color: #00fff5; font-weight: bold; }
+
+        .guide-text { font-size: 10px; color: #00fff5; margin-top: 5px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -110,12 +112,12 @@
 
         <div id="tab-play" class="page-tab">
             <div class="canvas-container">
-                <canvas id="gameCanvas" width="360" height="200"></canvas>
+                <canvas id="gameCanvas" width="360" height="210"></canvas>
                 
                 <div id="menu-overlay" class="game-overlay">
                     <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
                     <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
-                    <button id="start-game-btn" class="btn-primary" style="width: 150px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
+                    <button id="start-game-btn" class="btn-primary" style="width: 160px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
                 </div>
             </div>
 
@@ -127,11 +129,12 @@
                     <div class="dpad-btn dpad-down" ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')">▼</div>
                 </div>
                 <div class="action-btns">
-                    <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Không Có Skill</button>
-                    <button id="skill2Btn" class="btn-music hidden" onclick="useSkill2()" disabled>🎵 Phát Nhạc (300s)</button>
+                    <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Skill 1 (Phím 1)</button>
+                    <button id="skill2Btn" class="btn-music hidden" onclick="useSkill2()" disabled>🎵 Skill 2 (Phím 2)</button>
                     <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
                 </div>
             </div>
+            <div class="guide-text">🎮 TV/PC: Mũi tên (Di chuyển) | Phím 1 (Skill 1) | Phím 2 (Skill 2)</div>
         </div>
 
         <div id="tab-shop" class="page-tab hidden">
@@ -212,11 +215,55 @@
         let currentAccount = null;
         let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
 
-        // CANVASES XỬ LÝ XÓA NỀN TRẮNG CỦA VIDEO MÈO
         const catVideo = document.getElementById('catSkillVideo');
         const bgMusic = document.getElementById('bgMusic');
         const processCanvas = document.createElement('canvas');
         const processCtx = processCanvas.getContext('2d');
+
+        // --- BẮT SỰ KIỆN BÀN PHÍM / REMOTE SMART TV / MÁY TÍNH ---
+        window.addEventListener('keydown', (e) => {
+            // Tránh can thiệp khi đang gõ vào ô nhập tin nhắn/mật khẩu
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+            const key = e.key || e.code;
+
+            // Di chuyển (TV Remote / PC Keyboard)
+            if (['ArrowUp', 'KeyW', 'w', 'W'].includes(key)) { startMove('up'); e.preventDefault(); }
+            if (['ArrowDown', 'KeyS', 's', 'S'].includes(key)) { startMove('down'); e.preventDefault(); }
+            if (['ArrowLeft', 'KeyA', 'a', 'A'].includes(key)) { startMove('left'); e.preventDefault(); }
+            if (['ArrowRight', 'KeyD', 'd', 'D'].includes(key)) { startMove('right'); e.preventDefault(); }
+
+            // Bấm Phím 1 -> Skill 1
+            if (['1', 'Digit1', 'Numpad1', 'KeyQ', 'q', 'Q', ' '].includes(key)) {
+                useActiveSkill();
+                e.preventDefault();
+            }
+
+            // Bấm Phím 2 -> Skill 2 (Phát nhạc)
+            if (['2', 'Digit2', 'Numpad2', 'KeyE', 'e', 'E'].includes(key)) {
+                useSkill2();
+                e.preventDefault();
+            }
+
+            // Phím Enter / OK -> Bắt đầu chơi khi ở Sảnh Chờ
+            if (['Enter', 'NumpadEnter', 'Select'].includes(key)) {
+                if (!isGamePlaying) startGameSession();
+            }
+
+            // Phím Escape -> Tạm dừng / Sảnh chờ
+            if (['Escape'].includes(key)) {
+                if (isGamePlaying) stopGameSession('SẢNH CHỜ');
+            }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            const key = e.key || e.code;
+            if (['ArrowUp', 'KeyW', 'w', 'W'].includes(key)) stopMove('up');
+            if (['ArrowDown', 'KeyS', 's', 'S'].includes(key)) stopMove('down');
+            if (['ArrowLeft', 'KeyA', 'a', 'A'].includes(key)) stopMove('left');
+            if (['ArrowRight', 'KeyD', 'd', 'D'].includes(key)) stopMove('right');
+        });
 
         // --- GHI NHỚ ĐĂNG NHẬP TỰ ĐỘNG ---
         window.onload = function() {
@@ -290,7 +337,7 @@
             document.querySelectorAll('.page-tab').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + page).classList.remove('hidden');
-            event.target.classList.add('active');
+            if (event && event.target) event.target.classList.add('active');
             
             if(page !== 'play') stopGameSession('SẢNH CHỜ');
         }
@@ -387,21 +434,21 @@
                 return; 
             }
 
-            btn2.classList.add('hidden'); // Mặc định ẩn chiêu 2
+            btn2.classList.add('hidden');
 
             if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
-            else if(userData.equipped === 'ghost') { btn.innerText = "👻 Bất Tử (15s)"; btn.disabled = skillCD; } 
-            else if(userData.equipped === 'alien') { btn.innerText = "👾 Vòng Tròn (36s)"; btn.disabled = skillCD; } 
-            else if(userData.equipped === 'cat') { btn.innerText = "🐱 Trảm NPC Gần (8s)"; btn.disabled = skillCD; }
-            else if(userData.equipped === 'witch') { btn.innerText = "🪼 Đẩy NPC Ra Xa (6s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'ghost') { btn.innerText = "👻 Skill 1: Bất Tử (15s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'alien') { btn.innerText = "👾 Skill 1: Vòng Tròn (36s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'cat') { btn.innerText = "🐱 Skill 1: Trảm NPC (8s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'witch') { btn.innerText = "🪼 Skill 1: Đẩy NPC (6s)"; btn.disabled = skillCD; }
             else if(userData.equipped === 'music') {
-                btn.innerText = "✨ Dịch Chuyển (23s)"; btn.disabled = skillCD;
+                btn.innerText = "✨ Skill 1: Dịch Chuyển (23s)"; btn.disabled = skillCD;
                 btn2.classList.remove('hidden');
-                btn2.innerText = "🎵 Phát Nhạc (300s)"; btn2.disabled = skill2CD;
+                btn2.innerText = "🎵 Skill 2: Phát Nhạc (300s)"; btn2.disabled = skill2CD;
             }
         }
 
-        // Chiêu 1
+        // Chiêu 1 (Số 1 trên TV / PC / Nút Skill 1)
         function useActiveSkill() {
             if(skillCD || !isGamePlaying) return;
 
@@ -454,12 +501,10 @@
                 });
                 startCooldown(6, 'skillBtn');
             } else if(userData.equipped === 'music') {
-                // CHIÊU 1 MỚI: Dịch chuyển xa NPC nhất
                 if (npcs.length > 0) {
                     let maxAvgDist = -1;
                     let bestX = player.x, bestY = player.y;
 
-                    // Thử nghiệm các vị trí góc/cạnh bản đồ
                     let testPoints = [
                         {x: 20, y: 20}, {x: canvas.width - 20, y: 20},
                         {x: 20, y: canvas.height - 20}, {x: canvas.width - 20, y: canvas.height - 20},
@@ -488,7 +533,7 @@
             }
         }
 
-        // Chiêu 2 (Phát Nhạc cho nhân vật 🎶 Âm Nhạc)
+        // Chiêu 2 (Số 2 trên TV / PC / Nút Skill 2)
         function useSkill2() {
             if(skill2CD || !isGamePlaying || userData.equipped !== 'music') return;
 
@@ -505,7 +550,6 @@
             let btn = document.getElementById(btnId);
             let timer = seconds;
             btn.disabled = true;
-            let originalText = isSkill1 ? (userData.equipped === 'music' ? "✨ Dịch Chuyển" : "SKILL") : "🎵 Phát Nhạc";
 
             let cd = setInterval(() => {
                 timer--;
@@ -523,7 +567,7 @@
         const ctx = canvas.getContext('2d');
         let moveState = { up: false, down: false, left: false, right: false };
         
-        let player = { x: 180, y: 100, radius: 10, speed: 2.2 };
+        let player = { x: 180, y: 105, radius: 10, speed: 2.2 };
         let remotePlayer = { x: -100, y: -100, active: false, equipped: 'human' };
 
         let alienShield = { active: false, radius: 45 };
@@ -576,7 +620,7 @@
 
         function startGameSession() {
             isGamePlaying = true;
-            player.x = 180; player.y = 100;
+            player.x = 180; player.y = 105;
             droppedCoins = [];
             slashEffects = [];
             document.getElementById('menu-overlay').classList.add('hidden');
@@ -597,7 +641,7 @@
             document.getElementById('overlay-sub').innerText = subText;
             overlay.classList.remove('hidden');
             clearTimeout(coinSpawnTimer);
-            bgMusic.pause(); // Dừng nhạc khi thoát/dừng game
+            bgMusic.pause();
             updateSkillButton();
         }
 
@@ -668,7 +712,7 @@
             });
         }
 
-        // VẼ HOẠT ẢNH VIDEO VÀ XÓA NỀN TRẮNG REALTIME TẠI TỌA ĐỘ NPC
+        // VẼ HOẠT ẢNH VIDEO VÀ XÓA NỀN TRẮNG REALTIME
         function drawSlashEffects() {
             if (catVideo.videoWidth > 0) {
                 processCanvas.width = catVideo.videoWidth;
