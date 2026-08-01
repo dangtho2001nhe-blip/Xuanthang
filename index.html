@@ -74,7 +74,8 @@
 </head>
 <body>
 
-    <!-- AUTH PANEL -->
+    <video id="catSkillVideo" src="trim.042206A4-3EA1-41F6-AFAA-D21291370998.MOV" playsinline muted style="display:none;"></video>
+
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
         <div class="input-group">
@@ -90,14 +91,12 @@
         <p id="status" style="font-size: 12px; color: #ff4757;"></p>
     </div>
 
-    <!-- MAIN GAME PANEL -->
     <div id="game-panel" class="card hidden">
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
             <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
         </div>
         
-        <!-- NAV BAR -->
         <div class="nav-bar">
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
             <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
@@ -107,7 +106,6 @@
             <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
         </div>
 
-        <!-- 1. PLAY TAB -->
         <div id="tab-play" class="page-tab">
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="200"></canvas>
@@ -133,7 +131,6 @@
             </div>
         </div>
 
-        <!-- 2. SHOP TAB -->
         <div id="tab-shop" class="page-tab hidden">
             <div class="item-card">
                 <div class="item-info">
@@ -165,12 +162,10 @@
             </div>
         </div>
 
-        <!-- 3. BALO TAB -->
         <div id="tab-balo" class="page-tab hidden">
             <div id="inventory-list"></div>
         </div>
 
-        <!-- 4. GIFTCODE TAB -->
         <div id="tab-code" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 12px; color: #00fff5; margin-bottom: 8px;">NHẬP MÃ QUÀ TẶNG GIFTCODE</p>
@@ -179,7 +174,6 @@
             </div>
         </div>
 
-        <!-- 5. ONLINE MULTIPLAYER REAL-TIME TAB -->
         <div id="tab-pvp" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
@@ -192,7 +186,6 @@
             <p id="net-status" style="font-size: 11px; color: #f1c40f; margin-top: 8px;">Trạng thái: Chưa kết nối</p>
         </div>
 
-        <!-- 6. CHAT TAB -->
         <div id="tab-chat" class="page-tab hidden">
             <div class="chat-box" id="chat-messages">
                 <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Chào mừng tới phòng chat thế giới!</div>
@@ -208,6 +201,11 @@
     <script>
         let currentAccount = null;
         let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
+
+        // CANVASES XỬ LÝ XÓA NỀN TRẮNG CỦA VIDEO
+        const catVideo = document.getElementById('catSkillVideo');
+        const processCanvas = document.createElement('canvas');
+        const processCtx = processCanvas.getContext('2d');
 
         // --- GHI NHỚ ĐĂNG NHẬP TỰ ĐỘNG ---
         window.onload = function() {
@@ -399,12 +397,22 @@
 
                 if (closestIndex !== -1) {
                     let targetNpc = npcs[closestIndex];
-                    slashEffects.push({ x: targetNpc.x, y: targetNpc.y, frame: 0, maxFrame: 15 });
+                    
+                    // Phát video hoạt ảnh ngay tại vị trí NPC vừa bị tiêu diệt
+                    catVideo.currentTime = 0;
+                    catVideo.play().catch(e => console.log(e));
+
+                    slashEffects.push({
+                        x: targetNpc.x,
+                        y: targetNpc.y,
+                        frame: 0,
+                        maxFrame: 45 // Thời gian hiển thị hoạt ảnh
+                    });
+
                     npcs.splice(closestIndex, 1);
                     startCooldown(8);
                 }
             } else if(userData.equipped === 'witch') {
-                // Kỹ năng Phù Thủy: Đẩy NPC ra xa vị trí hiện tại
                 npcs.forEach(npc => {
                     let dx = npc.x - player.x;
                     let dy = npc.y - player.y;
@@ -581,20 +589,36 @@
             });
         }
 
-        // VẼ HIỆU ỨNG TRẢM CỦA MÈO
+        // VẼ HOẠT ẢNH VIDEO VÀ XÓA NỀN TRẮNG REALTIME TẠI TỌA ĐỘ NPC
         function drawSlashEffects() {
+            if (catVideo.videoWidth > 0) {
+                // Đặt kích thước cho Canvas ẩn
+                processCanvas.width = catVideo.videoWidth;
+                processCanvas.height = catVideo.videoHeight;
+                
+                // Vẽ frame hiện tại của video vào Canvas ẩn
+                processCtx.drawImage(catVideo, 0, 0);
+                let imgData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
+                let data = imgData.data;
+
+                // Thuật toán quét và xóa nền trắng
+                for (let i = 0; i < data.length; i += 4) {
+                    let r = data[i], g = data[i+1], b = data[i+2];
+                    if (r > 200 && g > 200 && b > 200) {
+                        data[i + 3] = 0; // Biến màu trắng thành trong suốt
+                    }
+                }
+                processCtx.putImageData(imgData, 0, 0);
+            }
+
             slashEffects.forEach((eff) => {
                 ctx.save();
-                ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3; ctx.shadowColor = '#ff2e93'; ctx.shadowBlur = 10;
-                let size = 18;
-                ctx.beginPath();
-                ctx.moveTo(eff.x - size, eff.y - size); ctx.lineTo(eff.x + size, eff.y + size);
-                ctx.moveTo(eff.x - size + 6, eff.y - size - 4); ctx.lineTo(eff.x + size + 6, eff.y + size - 4);
-                ctx.moveTo(eff.x - size - 6, eff.y - size + 4); ctx.lineTo(eff.x + size - 6, eff.y + size + 4);
-                ctx.stroke();
+                let size = 50; // Kích thước hiển thị hoạt ảnh
+                ctx.drawImage(processCanvas, eff.x - size / 2, eff.y - size / 2, size, size);
                 ctx.restore();
                 eff.frame++;
             });
+
             slashEffects = slashEffects.filter(eff => eff.frame < eff.maxFrame);
         }
 
@@ -613,7 +637,7 @@
                 ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
 
-            // 3. Vẽ Hoạt Ảnh Trảm NPC
+            // 3. Vẽ Hoạt Ảnh Video Mèo (Đã xóa nền trắng)
             drawSlashEffects();
 
             const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼' };
