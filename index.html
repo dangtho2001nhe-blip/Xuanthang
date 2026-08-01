@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Cyber Game - Multi-Device (Mobile, PC, Smart TV)</title>
+    <title>Super Cyber Game - Multi-Device & Leaderboard</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
@@ -17,8 +17,8 @@
         h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
         
         /* Navigation Tabs */
-        .nav-bar { display: flex; gap: 4px; margin-bottom: 12px; background: #0f172a; padding: 4px; border-radius: 12px; }
-        .nav-btn { flex: 1; padding: 7px 2px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-bar { display: flex; gap: 4px; margin-bottom: 12px; background: #0f172a; padding: 4px; border-radius: 12px; overflow-x: auto; }
+        .nav-btn { flex: 1; padding: 7px 4px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; whitespace: nowrap; }
         .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
         /* General Inputs & Buttons */
@@ -36,12 +36,17 @@
         button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; outline: none !important; }
 
         .hidden { display: none !important; }
-        .money-box { font-size: 14px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .money-box { font-size: 13px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         /* Canvas Game & Overlay Menu */
         .canvas-container { position: relative; width: 100%; height: 210px; margin-bottom: 8px; }
         canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 100%; display: block; }
         
+        .timer-display {
+            position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.7); color: #00fff5;
+            padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: bold; border: 1px solid #00fff5;
+        }
+
         .game-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(5, 11, 20, 0.92); border-radius: 12px;
@@ -50,7 +55,7 @@
         }
 
         /* Controls */
-        .controls-container { display: flex; justify-content: space-between; align-items: center; }
+        .controls-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
         .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 14px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
         .dpad-up { grid-column: 2; grid-row: 1; }
@@ -68,11 +73,16 @@
         .room-box { background: #0f172a; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px dashed #00fff5; text-align: center; }
 
         /* Chat Box */
-        .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 180px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 12px; margin-bottom: 8px; }
-        .chat-msg { margin-bottom: 5px; word-break: break-all; }
+        .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 120px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 11px; margin-bottom: 6px; }
+        .chat-msg { margin-bottom: 4px; word-break: break-all; }
         .chat-user { color: #00fff5; font-weight: bold; }
 
-        .guide-text { font-size: 10px; color: #00fff5; margin-top: 5px; opacity: 0.8; }
+        /* Leaderboard Table */
+        .lb-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 12px; }
+        .lb-table th { background: #0f172a; color: #00fff5; padding: 6px; border-bottom: 2px solid #1f4068; }
+        .lb-table td { padding: 6px; border-bottom: 1px solid #1f4068; }
+
+        .guide-text { font-size: 10px; color: #00fff5; margin-top: 3px; opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -98,22 +108,25 @@
     <div id="game-panel" class="card hidden">
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
-            <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
+            <span>🏆 Kỷ lục: <span id="best-time-display" style="color:#00fff5;">0s</span></span>
+            <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
         </div>
         
         <div class="nav-bar">
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
+            <button class="nav-btn" onclick="switchPage('rank')">XẾP HẠNG</button>
             <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
             <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
             <button class="nav-btn" onclick="switchPage('code')">CODE</button>
             <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
-            <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
         </div>
 
         <div id="tab-play" class="page-tab">
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="210"></canvas>
                 
+                <div class="timer-display">⏱️ <span id="gameTimer">00:00</span></div>
+
                 <div id="menu-overlay" class="game-overlay">
                     <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
                     <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
@@ -134,7 +147,31 @@
                     <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
                 </div>
             </div>
+
+            <div class="chat-box" id="in-game-chat">
+                <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Khung chat trực tiếp trong trận đấu.</div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
+                <button class="btn-primary" style="width: 70px; margin: 0; padding: 6px;" onclick="sendChat()">GỬI</button>
+            </div>
+
             <div class="guide-text">🎮 TV/PC: Mũi tên (Di chuyển) | Phím 1 (Skill 1) | Phím 2 (Skill 2)</div>
+        </div>
+
+        <div id="tab-rank" class="page-tab hidden">
+            <h3 style="color: #00fff5; margin-top: 5px;">🏆 BẢNG XẾP HẠNG THỜI GIAN SỐNG SÓT</h3>
+            <table class="lb-table">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Tài Khoản</th>
+                        <th>Kỷ Lục</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    </tbody>
+            </table>
         </div>
 
         <div id="tab-shop" class="page-tab hidden">
@@ -199,21 +236,11 @@
             <p id="net-status" style="font-size: 11px; color: #f1c40f; margin-top: 8px;">Trạng thái: Chưa kết nối</p>
         </div>
 
-        <div id="tab-chat" class="page-tab hidden">
-            <div class="chat-box" id="chat-messages">
-                <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Chào mừng tới phòng chat thế giới!</div>
-            </div>
-            <div style="display: flex; gap: 5px;">
-                <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
-                <button class="btn-primary" style="width: 80px; margin: 0;" onclick="sendChat()">GỬI</button>
-            </div>
-        </div>
-
     </div>
 
     <script>
         let currentAccount = null;
-        let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
+        let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [], bestTime: 0 };
 
         const catVideo = document.getElementById('catSkillVideo');
         const bgMusic = document.getElementById('bgMusic');
@@ -231,23 +258,10 @@
             if (['ArrowLeft', 'KeyA', 'a', 'A'].includes(key)) { startMove('left'); e.preventDefault(); }
             if (['ArrowRight', 'KeyD', 'd', 'D'].includes(key)) { startMove('right'); e.preventDefault(); }
 
-            if (['1', 'Digit1', 'Numpad1', 'KeyQ', 'q', 'Q', ' '].includes(key)) {
-                useActiveSkill();
-                e.preventDefault();
-            }
-
-            if (['2', 'Digit2', 'Numpad2', 'KeyE', 'e', 'E'].includes(key)) {
-                useSkill2();
-                e.preventDefault();
-            }
-
-            if (['Enter', 'NumpadEnter', 'Select'].includes(key)) {
-                if (!isGamePlaying) startGameSession();
-            }
-
-            if (['Escape'].includes(key)) {
-                if (isGamePlaying) stopGameSession('SẢNH CHỜ');
-            }
+            if (['1', 'Digit1', 'Numpad1', 'KeyQ', 'q', 'Q', ' '].includes(key)) { useActiveSkill(); e.preventDefault(); }
+            if (['2', 'Digit2', 'Numpad2', 'KeyE', 'e', 'E'].includes(key)) { useSkill2(); e.preventDefault(); }
+            if (['Enter', 'NumpadEnter', 'Select'].includes(key)) { if (!isGamePlaying) startGameSession(); }
+            if (['Escape'].includes(key)) { if (isGamePlaying) stopGameSession('SẢNH CHỜ'); }
         });
 
         window.addEventListener('keyup', (e) => {
@@ -268,6 +282,7 @@
                     currentAccount = savedAccount;
                     userData = JSON.parse(data);
                     if(!userData.claimedCodes) userData.claimedCodes = [];
+                    if(!userData.bestTime) userData.bestTime = 0;
                     document.getElementById('auth-panel').classList.add('hidden');
                     document.getElementById('game-panel').classList.remove('hidden');
                     document.getElementById('user-display').innerText = savedAccount;
@@ -286,7 +301,7 @@
 
             if(type === 'register') {
                 if(localStorage.getItem('acc_' + u)) return st.innerText = "Tài khoản đã tồn tại!";
-                let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [] };
+                let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [], bestTime: 0 };
                 localStorage.setItem('acc_' + u, JSON.stringify(newData));
                 st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công!";
             } else {
@@ -298,6 +313,7 @@
                 currentAccount = u;
                 userData = parsed;
                 if(!userData.claimedCodes) userData.claimedCodes = [];
+                if(!userData.bestTime) userData.bestTime = 0;
                 localStorage.setItem('last_logged_user', u);
 
                 document.getElementById('auth-panel').classList.add('hidden');
@@ -320,9 +336,11 @@
 
         function updateUI() {
             document.getElementById('money-display').innerText = userData.money;
+            document.getElementById('best-time-display').innerText = userData.bestTime + 's';
             updateShopUI();
             updateBaloUI();
             updateSkillButton();
+            updateLeaderboardUI();
         }
 
         function switchPage(page) {
@@ -332,6 +350,34 @@
             if (event && event.target) event.target.classList.add('active');
             
             if(page !== 'play') stopGameSession('SẢNH CHỜ');
+        }
+
+        // BẢNG XẾP HẠNG
+        function updateLeaderboardUI() {
+            let tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = "";
+            let users = [];
+
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith('acc_')) {
+                    let uName = key.replace('acc_', '');
+                    let data = JSON.parse(localStorage.getItem(key));
+                    users.push({ name: uName, bestTime: data.bestTime || 0 });
+                }
+            }
+
+            users.sort((a, b) => b.bestTime - a.bestTime);
+
+            users.forEach((u, index) => {
+                let rankBadge = index === 0 ? "🥇 1" : (index === 1 ? "🥈 2" : (index === 2 ? "🥉 3" : (index + 1)));
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:#00fff5;">${rankBadge}</td>
+                        <td>${u.name}</td>
+                        <td style="color:#f1c40f; font-weight:bold;">${u.bestTime}s</td>
+                    </tr>`;
+            });
         }
 
         function buyItem(item, price) {
@@ -388,7 +434,7 @@
 
         function equipItem(item) {
             userData.equipped = item;
-            resetSkillCooldowns(); // Reset hồi chiêu khi đổi nhân vật
+            resetSkillCooldowns();
             saveData();
             updateUI();
         }
@@ -411,20 +457,15 @@
             }
         }
 
-        // --- HỆ THỐNG SKILL & RESET COOLDOWN ---
-        let skillCD = false;
-        let skill2CD = false;
-        let cdTimer1 = null;
-        let cdTimer2 = null;
+        // SKILL & COOLDOWN
+        let skillCD = false, skill2CD = false;
+        let cdTimer1 = null, cdTimer2 = null;
 
-        // Hàm Reset thời gian hồi chiêu khi Chết/Chơi lại
         function resetSkillCooldowns() {
-            skillCD = false;
-            skill2CD = false;
+            skillCD = false; skill2CD = false;
             if (cdTimer1) clearInterval(cdTimer1);
             if (cdTimer2) clearInterval(cdTimer2);
-            cdTimer1 = null;
-            cdTimer2 = null;
+            cdTimer1 = null; cdTimer2 = null;
             updateSkillButton();
         }
 
@@ -465,12 +506,10 @@
                 startCooldown(36, 'skillBtn');
             } else if(userData.equipped === 'cat') {
                 if (npcs.length === 0) return;
-                let closestIndex = -1;
-                let minDist = Infinity;
+                let closestIndex = -1, minDist = Infinity;
 
                 npcs.forEach((npc, index) => {
-                    let dx = player.x - npc.x;
-                    let dy = player.y - npc.y;
+                    let dx = player.x - npc.x, dy = player.y - npc.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < minDist) { minDist = dist; closestIndex = index; }
                 });
@@ -479,41 +518,24 @@
                     let targetNpc = npcs[closestIndex];
                     catVideo.currentTime = 0;
                     catVideo.play().catch(e => console.log(e));
-
-                    slashEffects.push({
-                        x: targetNpc.x,
-                        y: targetNpc.y,
-                        frame: 0,
-                        maxFrame: 45
-                    });
-
+                    slashEffects.push({ x: targetNpc.x, y: targetNpc.y, frame: 0, maxFrame: 45 });
                     npcs.splice(closestIndex, 1);
                     startCooldown(8, 'skillBtn');
                 }
             } else if(userData.equipped === 'witch') {
                 npcs.forEach(npc => {
-                    let dx = npc.x - player.x;
-                    let dy = npc.y - player.y;
+                    let dx = npc.x - player.x, dy = npc.y - player.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     if(dist === 0) dist = 1;
-                    let pushDistance = 120;
-                    npc.x += (dx / dist) * pushDistance;
-                    npc.y += (dy / dist) * pushDistance;
+                    npc.x += (dx / dist) * 120; npc.y += (dy / dist) * 120;
                     npc.x = Math.max(10, Math.min(canvas.width - 10, npc.x));
                     npc.y = Math.max(10, Math.min(canvas.height - 10, npc.y));
                 });
                 startCooldown(6, 'skillBtn');
             } else if(userData.equipped === 'music') {
                 if (npcs.length > 0) {
-                    let maxAvgDist = -1;
-                    let bestX = player.x, bestY = player.y;
-
-                    let testPoints = [
-                        {x: 20, y: 20}, {x: canvas.width - 20, y: 20},
-                        {x: 20, y: canvas.height - 20}, {x: canvas.width - 20, y: canvas.height - 20},
-                        {x: canvas.width / 2, y: 20}, {x: canvas.width / 2, y: canvas.height - 20},
-                        {x: 20, y: canvas.height / 2}, {x: canvas.width - 20, y: canvas.height / 2}
-                    ];
+                    let maxAvgDist = -1, bestX = player.x, bestY = player.y;
+                    let testPoints = [{x: 20, y: 20}, {x: canvas.width - 20, y: 20}, {x: 20, y: canvas.height - 20}, {x: canvas.width - 20, y: canvas.height - 20}];
 
                     testPoints.forEach(p => {
                         let minDistToNpc = Infinity;
@@ -521,16 +543,9 @@
                             let d = Math.sqrt((p.x - npc.x)**2 + (p.y - npc.y)**2);
                             if (d < minDistToNpc) minDistToNpc = d;
                         });
-
-                        if (minDistToNpc > maxAvgDist) {
-                            maxAvgDist = minDistToNpc;
-                            bestX = p.x;
-                            bestY = p.y;
-                        }
+                        if (minDistToNpc > maxAvgDist) { maxAvgDist = minDistToNpc; bestX = p.x; bestY = p.y; }
                     });
-
-                    player.x = bestX;
-                    player.y = bestY;
+                    player.x = bestX; player.y = bestY;
                 }
                 startCooldown(23, 'skillBtn');
             }
@@ -538,9 +553,7 @@
 
         function useSkill2() {
             if(skill2CD || !isGamePlaying || userData.equipped !== 'music') return;
-
-            bgMusic.currentTime = 0;
-            bgMusic.play().catch(e => console.log(e));
+            bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
             startCooldown(300, 'skill2Btn');
         }
 
@@ -556,11 +569,7 @@
                 cdTimer1 = setInterval(() => {
                     timer--;
                     if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
-                    else { 
-                        clearInterval(cdTimer1); cdTimer1 = null;
-                        skillCD = false; 
-                        updateSkillButton(); 
-                    }
+                    else { clearInterval(cdTimer1); cdTimer1 = null; skillCD = false; updateSkillButton(); }
                 }, 1000);
             } else {
                 skill2CD = true;
@@ -568,16 +577,42 @@
                 cdTimer2 = setInterval(() => {
                     timer--;
                     if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
-                    else { 
-                        clearInterval(cdTimer2); cdTimer2 = null;
-                        skill2CD = false; 
-                        updateSkillButton(); 
-                    }
+                    else { clearInterval(cdTimer2); cdTimer2 = null; skill2CD = false; updateSkillButton(); }
                 }, 1000);
             }
         }
 
-        // --- GAME ENGINE & MULTIPLAYER ---
+        // BỘ ĐẾM THỜI GIAN SỐNG SÓT
+        let survivalSeconds = 0;
+        let survivalTimer = null;
+
+        function startSurvivalTimer() {
+            survivalSeconds = 0;
+            updateTimerDisplay();
+            if (survivalTimer) clearInterval(survivalTimer);
+            survivalTimer = setInterval(() => {
+                survivalSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopSurvivalTimer() {
+            if (survivalTimer) clearInterval(survivalTimer);
+            survivalTimer = null;
+            if (survivalSeconds > userData.bestTime) {
+                userData.bestTime = survivalSeconds;
+                saveData();
+                updateUI();
+            }
+        }
+
+        function updateTimerDisplay() {
+            let mins = Math.floor(survivalSeconds / 60).toString().padStart(2, '0');
+            let secs = (survivalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
+        }
+
+        // GAME ENGINE & MULTIPLAYER
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let moveState = { up: false, down: false, left: false, right: false };
@@ -587,20 +622,14 @@
 
         let alienShield = { active: false, radius: 45 };
         let ghostInvincible = { active: false };
-        let slashEffects = [];
-        let npcs = [];
-        let droppedCoins = [];
-        let isGamePlaying = false;
-        let coinSpawnTimer = null;
+        let slashEffects = [], npcs = [], droppedCoins = [];
+        let isGamePlaying = false, coinSpawnTimer = null;
 
-        let peer = null;
-        let conn = null;
+        let peer = null, conn = null;
 
         function initPeerJS() {
             peer = new Peer();
-            peer.on('open', (id) => {
-                document.getElementById('my-peer-id').innerText = id;
-            });
+            peer.on('open', (id) => { document.getElementById('my-peer-id').innerText = id; });
             peer.on('connection', (connection) => {
                 conn = connection;
                 setupNetworkEvents();
@@ -623,9 +652,13 @@
         function setupNetworkEvents() {
             remotePlayer.active = true;
             conn.on('data', (data) => {
-                remotePlayer.x = data.x;
-                remotePlayer.y = data.y;
-                remotePlayer.equipped = data.equipped;
+                if (data.type === 'move') {
+                    remotePlayer.x = data.x;
+                    remotePlayer.y = data.y;
+                    remotePlayer.equipped = data.equipped;
+                } else if (data.type === 'chat') {
+                    appendChatMessage(data.sender, data.msg);
+                }
             });
         }
 
@@ -635,11 +668,11 @@
         function startGameSession() {
             isGamePlaying = true;
             player.x = 180; player.y = 105;
-            droppedCoins = [];
-            slashEffects = [];
+            droppedCoins = []; slashEffects = [];
             document.getElementById('menu-overlay').classList.add('hidden');
             
-            resetSkillCooldowns(); // RESET COOLDOWN CHIÊU KHI VÀO TRẬN MỚI
+            resetSkillCooldowns();
+            startSurvivalTimer();
 
             npcs = [];
             let count = Math.floor(Math.random() * 3) + 2;
@@ -653,12 +686,14 @@
             isGamePlaying = false;
             let overlay = document.getElementById('menu-overlay');
             document.getElementById('overlay-title').innerText = titleText;
-            document.getElementById('overlay-sub').innerText = subText;
+            document.getElementById('overlay-sub').innerText = subText ? subText : `Thời gian sống sót: ${survivalSeconds}s`;
             overlay.classList.remove('hidden');
+            
             clearTimeout(coinSpawnTimer);
             bgMusic.pause();
             
-            resetSkillCooldowns(); // RESET COOLDOWN KHI CHẾT / TẠM DỪNG
+            stopSurvivalTimer();
+            resetSkillCooldowns();
         }
 
         function scheduleNextCoin() {
@@ -682,7 +717,7 @@
             if (moveState.right && player.x + player.radius < canvas.width) { player.x += player.speed; moved = true; }
 
             if(moved && conn && conn.open) {
-                conn.send({ x: player.x, y: player.y, equipped: userData.equipped });
+                conn.send({ type: 'move', x: player.x, y: player.y, equipped: userData.equipped });
             }
 
             // Ăn Xu
@@ -718,7 +753,7 @@
 
                 if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
 
-                // Va chạm NPC = Chết
+                // Va chạm = Chết
                 if (Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2) < player.radius + npc.radius) {
                     if (!(ghostInvincible.active && userData.equipped === 'ghost')) {
                         stopGameSession('💀 BẠN ĐÃ CHẾT!');
@@ -728,29 +763,23 @@
             });
         }
 
-        // VẼ HOẠT ẢNH VIDEO VÀ XÓA NỀN TRẮNG REALTIME
         function drawSlashEffects() {
             if (catVideo.videoWidth > 0) {
                 processCanvas.width = catVideo.videoWidth;
                 processCanvas.height = catVideo.videoHeight;
-                
                 processCtx.drawImage(catVideo, 0, 0);
                 let imgData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
                 let data = imgData.data;
 
                 for (let i = 0; i < data.length; i += 4) {
-                    let r = data[i], g = data[i+1], b = data[i+2];
-                    if (r > 200 && g > 200 && b > 200) {
-                        data[i + 3] = 0;
-                    }
+                    if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) data[i + 3] = 0;
                 }
                 processCtx.putImageData(imgData, 0, 0);
             }
 
             slashEffects.forEach((eff) => {
                 ctx.save();
-                let size = 50;
-                ctx.drawImage(processCanvas, eff.x - size / 2, eff.y - size / 2, size, size);
+                ctx.drawImage(processCanvas, eff.x - 25, eff.y - 25, 50, 50);
                 ctx.restore();
                 eff.frame++;
             });
@@ -761,38 +790,32 @@
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Vẽ Xu
             droppedCoins.forEach(coin => {
                 ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
             });
 
-            // 2. Vẽ Vòng Alien
             if (alienShield.active && userData.equipped === 'alien') {
                 ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
 
-            // 3. Vẽ Hoạt Ảnh Video Mèo
             drawSlashEffects();
 
             const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼', music: '🎶' };
 
-            // 4. Vẽ Người Chơi Chính
             ctx.save();
             if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
             ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             ctx.fillText(icons[userData.equipped] || '🧍', player.x, player.y);
             ctx.restore();
 
-            // 5. Vẽ Đối Thủ Online
             if(remotePlayer.active) {
                 ctx.fillText(icons[remotePlayer.equipped] || '🧍', remotePlayer.x, remotePlayer.y);
                 ctx.font = '9px Arial'; ctx.fillStyle = '#e94560';
                 ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
             }
 
-            // 6. Vẽ NPC Địch (Quái Đỏ)
             npcs.forEach(npc => {
                 ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
             });
@@ -802,13 +825,25 @@
         function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
         function initGameEngine() { if (!isEngineRunning) { isEngineRunning = true; gameLoop(); } }
 
-        // --- CHAT ---
+        // TÍNH NĂNG CHAT REAL-TIME TRONG VÀ NGOÀI TRẬN
         function sendChat() {
             let inp = document.getElementById('chat-input');
-            if(!inp.value.trim()) return;
-            let box = document.getElementById('chat-messages');
-            box.innerHTML += `<div class="chat-msg"><span class="chat-user">${currentAccount}:</span> ${inp.value}</div>`;
-            inp.value = ""; box.scrollTop = box.scrollHeight;
+            let msg = inp.value.trim();
+            if(!msg) return;
+
+            appendChatMessage(currentAccount, msg);
+
+            if (conn && conn.open) {
+                conn.send({ type: 'chat', sender: currentAccount, msg: msg });
+            }
+
+            inp.value = "";
+        }
+
+        function appendChatMessage(sender, msg) {
+            let box = document.getElementById('in-game-chat');
+            box.innerHTML += `<div class="chat-msg"><span class="chat-user">${sender}:</span> ${msg}</div>`;
+            box.scrollTop = box.scrollHeight;
         }
     </script>
 </body>
