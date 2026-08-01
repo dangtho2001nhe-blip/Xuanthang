@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Game Cyberpunk - PvP 2v2</title>
+    <title>Super Cyber Game - Real-time Online</title>
+    <!-- Thư viện PeerJS Kết nối Multiplayer Trực Tiếp FREE -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
         body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
         .card { 
-            background: rgba(22, 33, 62, 0.95); 
-            padding: 15px; 
-            border-radius: 20px; 
-            width: 100%; 
-            max-width: 400px; 
-            text-align: center; 
-            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2);
-            border: 1px solid rgba(0, 255, 245, 0.3);
-            position: relative;
+            background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 400px; text-align: center; 
+            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); border: 1px solid rgba(0, 255, 245, 0.3); position: relative;
         }
 
         h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
         
         /* Navigation Tabs */
-        .nav-bar { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 12px; }
-        .nav-btn { flex: 1; padding: 8px 2px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-bar { display: flex; gap: 4px; margin-bottom: 12px; background: #0f172a; padding: 4px; border-radius: 12px; }
+        .nav-btn { flex: 1; padding: 7px 2px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
         .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
         /* General Inputs & Buttons */
@@ -41,7 +36,7 @@
         button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
 
         .hidden { display: none !important; }
-        .money-box { font-size: 15px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .money-box { font-size: 14px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         /* Canvas Game & Overlay Menu */
         .canvas-container { position: relative; width: 100%; height: 200px; margin-bottom: 8px; }
@@ -64,11 +59,13 @@
         .dpad-down { grid-column: 2; grid-row: 3; }
         .action-btns { width: 55%; display: flex; flex-direction: column; gap: 4px; }
 
-        /* Item Cards & Room Cards */
+        /* Item Cards & Room Info */
         .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-info { text-align: left; }
         .item-title { font-weight: bold; color: #00fff5; font-size: 13px; }
         .item-desc { font-size: 11px; color: #aaa; }
+        
+        .room-box { background: #0f172a; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px dashed #00fff5; text-align: center; }
 
         /* Chat Box */
         .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 180px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 12px; margin-bottom: 8px; }
@@ -98,7 +95,7 @@
     <div id="game-panel" class="card hidden">
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
-            <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Đăng Xuất</button>
+            <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
         </div>
         
         <!-- NAV BAR -->
@@ -106,7 +103,7 @@
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
             <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
             <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
-            <button class="nav-btn" onclick="switchPage('pvp')">PVP 2v2</button>
+            <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
             <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
         </div>
 
@@ -115,7 +112,6 @@
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="200"></canvas>
                 
-                <!-- OVERLAY SẢNH CHỜ / PvP READY -->
                 <div id="menu-overlay" class="game-overlay">
                     <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
                     <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
@@ -167,11 +163,17 @@
             <div id="inventory-list"></div>
         </div>
 
-        <!-- 4. PVP 2v2 TAB -->
+        <!-- 4. ONLINE MULTIPLAYER REAL-TIME TAB -->
         <div id="tab-pvp" class="page-tab hidden">
-            <button class="btn-success" style="margin-bottom: 10px;" onclick="createPvPRoom()">➕ Tạo Phòng 2v2 Mới</button>
-            <div style="font-size: 12px; color: #00fff5; text-align: left; margin-bottom: 5px;">🌐 Danh Sách Phòng Công Khai:</div>
-            <div id="pvp-room-list" style="max-height: 180px; overflow-y: auto;"></div>
+            <div class="room-box">
+                <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
+                <b id="my-peer-id" style="color: #00fff5; font-size: 14px; word-break: break-all;">Đang lấy mã...</b>
+            </div>
+
+            <p style="font-size: 12px; color: #00fff5; text-align: left; margin: 5px 0;">Nhập Mã ID Bạn Bè Để Đấu Online 2 Ngược:</p>
+            <input type="text" id="join-id-input" placeholder="Dán Mã ID đối thủ vào đây...">
+            <button class="btn-success" onclick="joinOnlineRoom()">⚔️ KẾT NỐI VÀO TRẬN ONLINE</button>
+            <p id="net-status" style="font-size: 11px; color: #f1c40f; margin-top: 8px;">Trạng thái: Chưa kết nối</p>
         </div>
 
         <!-- 5. CHAT TAB -->
@@ -191,7 +193,7 @@
         let currentAccount = null;
         let userData = { money: 0, inventory: ['human'], equipped: 'human' };
 
-        // --- TỰ ĐỘNG ĐĂNG NHẬP KHI MỞ LẠI WEB ---
+        // --- GHI NHỚ ĐĂNG NHẬP TỰ ĐỘNG ---
         window.onload = function() {
             let savedAccount = localStorage.getItem('last_logged_user');
             if(savedAccount) {
@@ -204,6 +206,7 @@
                     document.getElementById('user-display').innerText = savedAccount;
                     updateUI();
                     initGameEngine();
+                    initPeerJS();
                 }
             }
         };
@@ -228,13 +231,14 @@
                 
                 currentAccount = u;
                 userData = parsed;
-                localStorage.setItem('last_logged_user', u); // Lưu tự động đăng nhập
+                localStorage.setItem('last_logged_user', u);
 
                 document.getElementById('auth-panel').classList.add('hidden');
                 document.getElementById('game-panel').classList.remove('hidden');
                 document.getElementById('user-display').innerText = u;
                 updateUI();
                 initGameEngine();
+                initPeerJS();
             }
         }
 
@@ -252,7 +256,6 @@
             updateShopUI();
             updateBaloUI();
             updateSkillButton();
-            renderPvPRooms();
         }
 
         // --- NAVIGATION ---
@@ -358,20 +361,13 @@
             }, 1000);
         }
 
-        // --- GAME ENGINE & PVP LOGIC ---
+        // --- GAME ENGINE & MULTIPLAYER ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let moveState = { up: false, down: false, left: false, right: false };
         
-        let player = { x: 180, y: 150, radius: 10, speed: 2.2 };
-        let isPVPMode = false;
-        
-        // 2v2 Players Data
-        let pvpTeammate = { x: 140, y: 150, radius: 10, icon: '👾', alive: true };
-        let pvpEnemies = [
-            { x: 140, y: 30, radius: 10, icon: '🐱', alive: true },
-            { x: 180, y: 30, radius: 10, icon: '👻', alive: true }
-        ];
+        let player = { x: 180, y: 100, radius: 10, speed: 2.2 };
+        let remotePlayer = { x: -100, y: -100, active: false, equipped: 'human' };
 
         let alienShield = { active: false, radius: 45 };
         let ghostInvincible = { active: false };
@@ -381,11 +377,47 @@
         let isGamePlaying = false;
         let coinSpawnTimer = null;
 
+        // --- KẾT NỐI PEERJS (ONLINE MULTIPLAYER FREE) ---
+        let peer = null;
+        let conn = null;
+
+        function initPeerJS() {
+            peer = new Peer();
+            peer.on('open', (id) => {
+                document.getElementById('my-peer-id').innerText = id;
+            });
+            peer.on('connection', (connection) => {
+                conn = connection;
+                setupNetworkEvents();
+                document.getElementById('net-status').innerText = "🟢 Đã kết nối với Đối thủ!";
+                alert("🎉 Có người vừa kết nối đấu Online với bạn!");
+            });
+        }
+
+        function joinOnlineRoom() {
+            let targetId = document.getElementById('join-id-input').value.trim();
+            if(!targetId) return alert("Vui lòng nhập Mã ID!");
+
+            conn = peer.connect(targetId);
+            setupNetworkEvents();
+            document.getElementById('net-status').innerText = "🟢 Đã kết nối vào trận thành công!";
+            switchPage('play');
+            startGameSession();
+        }
+
+        function setupNetworkEvents() {
+            remotePlayer.active = true;
+            conn.on('data', (data) => {
+                remotePlayer.x = data.x;
+                remotePlayer.y = data.y;
+                remotePlayer.equipped = data.equipped;
+            });
+        }
+
         function startMove(d) { if(isGamePlaying) moveState[d] = true; }
         function stopMove(d) { moveState[d] = false; }
 
         function startGameSession() {
-            isPVPMode = false;
             isGamePlaying = true;
             player.x = 180; player.y = 100;
             droppedCoins = [];
@@ -405,61 +437,13 @@
             let overlay = document.getElementById('menu-overlay');
             document.getElementById('overlay-title').innerText = titleText;
             document.getElementById('overlay-sub').innerText = subText;
-            document.getElementById('start-game-btn').classList.remove('hidden');
             overlay.classList.remove('hidden');
             clearTimeout(coinSpawnTimer);
             updateSkillButton();
         }
 
-        // --- ĐẾM NGƯỢC 3S VÀO TRẬN PVP 2v2 ---
-        function joinPvPRoom(roomName) {
-            switchPage('play');
-            let overlay = document.getElementById('menu-overlay');
-            let title = document.getElementById('overlay-title');
-            let sub = document.getElementById('overlay-sub');
-            let btn = document.getElementById('start-game-btn');
-            
-            btn.classList.add('hidden');
-            overlay.classList.remove('hidden');
-            
-            let count = 3;
-            sub.innerText = "Phòng: " + roomName + " (2v2 Arena)";
-            title.innerText = "⏱️ CHUẨN BỊ: " + count + "s";
-
-            let timer = setInterval(() => {
-                count--;
-                if(count > 0) {
-                    title.innerText = "⏱️ CHUẨN BỊ: " + count + "s";
-                } else {
-                    clearInterval(timer);
-                    startPvPMatch();
-                }
-            }, 1000);
-        }
-
-        function startPvPMatch() {
-            isPVPMode = true;
-            isGamePlaying = true;
-            document.getElementById('menu-overlay').classList.add('hidden');
-
-            // Reset Đội 2v2
-            player.x = 220; player.y = 160;
-            pvpTeammate = { x: 140, y: 160, radius: 10, icon: '👾', alive: true };
-            pvpEnemies = [
-                { x: 140, y: 40, radius: 10, icon: '🐱', alive: true },
-                { x: 220, y: 40, radius: 10, icon: '👻', alive: true }
-            ];
-
-            // Quái Đuổi Theo Tất Cả
-            npcs = [];
-            for(let i = 0; i < 4; i++) {
-                npcs.push({ x: Math.random() * canvas.width, y: 100, radius: 8, speed: 1.1 });
-            }
-            updateSkillButton();
-        }
-
         function scheduleNextCoin() {
-            if(!isGamePlaying || isPVPMode) return;
+            if(!isGamePlaying) return;
             let time = (Math.floor(Math.random() * 4) + 3) * 1000;
             coinSpawnTimer = setTimeout(() => {
                 if(isGamePlaying) {
@@ -471,19 +455,16 @@
 
         function updateGame() {
             if(!isGamePlaying) return;
+            let moved = false;
 
-            // Player di chuyển
-            if (moveState.up && player.y - player.radius > 0) player.y -= player.speed;
-            if (moveState.down && player.y + player.radius < canvas.height) player.y += player.speed;
-            if (moveState.left && player.x - player.radius > 0) player.x -= player.speed;
-            if (moveState.right && player.x + player.radius < canvas.width) player.x += player.speed;
+            if (moveState.up && player.y - player.radius > 0) { player.y -= player.speed; moved = true; }
+            if (moveState.down && player.y + player.radius < canvas.height) { player.y += player.speed; moved = true; }
+            if (moveState.left && player.x - player.radius > 0) { player.x -= player.speed; moved = true; }
+            if (moveState.right && player.x + player.radius < canvas.width) { player.x += player.speed; moved = true; }
 
-            // Logique PvP 2v2 AI Di chuyển nhẹ
-            if(isPVPMode) {
-                if(pvpTeammate.alive) pvpTeammate.x += (Math.random() - 0.5) * 1.5;
-                pvpEnemies.forEach(e => {
-                    if(e.alive) { e.x += (Math.random() - 0.5) * 2; e.y += (Math.random() - 0.5) * 1.5; }
-                });
+            // Gửi tọa độ qua mạng cho người chơi kia
+            if(moved && conn && conn.open) {
+                conn.send({ x: player.x, y: player.y, equipped: userData.equipped });
             }
 
             // Ăn Xu
@@ -495,58 +476,35 @@
                 return true;
             });
 
-            // NPC di chuyển & Va chạm
+            // NPC di chuyển đuổi theo người chơi gần nhất
             npcs.forEach(npc => {
-                // Tìm mục tiêu gần nhất giữa các người chơi
                 let target = player;
                 let minDist = Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2);
 
-                if(isPVPMode) {
-                    if(pvpTeammate.alive) {
-                        let d = Math.sqrt((pvpTeammate.x - npc.x)**2 + (pvpTeammate.y - npc.y)**2);
-                        if(d < minDist) { minDist = d; target = pvpTeammate; }
-                    }
-                    pvpEnemies.forEach(e => {
-                        if(e.alive) {
-                            let d = Math.sqrt((e.x - npc.x)**2 + (e.y - npc.y)**2);
-                            if(d < minDist) { minDist = d; target = e; }
-                        }
-                    });
+                if(remotePlayer.active) {
+                    let d = Math.sqrt((remotePlayer.x - npc.x)**2 + (remotePlayer.y - npc.y)**2);
+                    if(d < minDist) { minDist = d; target = remotePlayer; }
                 }
 
                 let dx = target.x - npc.x, dy = target.y - npc.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
-
-                // XỬ LÝ CHẾT TRONG PVP 2v2
-                if(isPVPMode) {
-                    // Check đối thủ bị quái chạm -> Chết
-                    pvpEnemies.forEach(e => {
-                        if(e.alive && Math.sqrt((e.x - npc.x)**2 + (e.y - npc.y)**2) < e.radius + npc.radius) {
-                            e.alive = false;
-                        }
-                    });
-                    // Check đồng đội bị chạm -> Chết
-                    if(pvpTeammate.alive && Math.sqrt((pvpTeammate.x - npc.x)**2 + (pvpTeammate.y - npc.y)**2) < pvpTeammate.radius + npc.radius) {
-                        pvpTeammate.alive = false;
-                    }
-
-                    // Điều kiện Thắng / Thua PvP: Đội nào chết sạch trước thì thua
-                    let enemiesDead = pvpEnemies.every(e => !e.alive);
-                    let teamDead = (!pvpTeammate.alive) && (dist < player.radius + npc.radius);
-
-                    if(enemiesDead) {
-                        userData.money += 30; saveData(); updateUI();
-                        stopGameSession('🏆 ĐỘI BẠN CHIẾN THẮNG PVP!', 'Nhận thưởng: +30 Xu');
+                // Nếu dùng skill Alien (Vòng đẩy)
+                if (alienShield.active && userData.equipped === 'alien') {
+                    if (dist < alienShield.radius + npc.radius) {
+                        let angle = Math.atan2(dy, dx);
+                        npc.x = target.x - Math.cos(angle) * (alienShield.radius + npc.radius);
+                        npc.y = target.y - Math.sin(angle) * (alienShield.radius + npc.radius);
                         return;
                     }
                 }
 
-                // Va chạm Player chính
-                if (dist < player.radius + npc.radius) {
+                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
+
+                // VA CHẠM VỚI QUÁI = CHẾT
+                if (Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2) < player.radius + npc.radius) {
                     if (!(ghostInvincible.active && userData.equipped === 'ghost')) {
-                        stopGameSession('💀 BẠN ĐÃ CHẾT!', isPVPMode ? 'Đội bạn đã thất bại!' : '');
+                        stopGameSession('💀 BẠN ĐÃ CHẾT!');
                         return;
                     }
                 }
@@ -562,7 +520,7 @@
                 ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
             });
 
-            // 2. Vẽ Skill Alien
+            // 2. Vẽ Vòng Alien
             if (alienShield.active && userData.equipped === 'alien') {
                 ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
                 ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
@@ -574,20 +532,20 @@
                 ctx.moveTo(player.x - 30, player.y - 30); ctx.lineTo(player.x + 30, player.y + 30); ctx.stroke(); catSlashEffect--;
             }
 
-            // 4. Vẽ Người Chơi Chính
+            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱' };
+
+            // 4. Vẽ Người Chơi Chính (Bạn)
             ctx.save();
             if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
             ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-            let icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱' };
             ctx.fillText(icons[userData.equipped] || '🧍', player.x, player.y);
             ctx.restore();
 
-            // 5. Vẽ Đồng Đội & Đối Thủ Trong PvP 2v2
-            if(isPVPMode) {
-                if(pvpTeammate.alive) ctx.fillText(pvpTeammate.icon, pvpTeammate.x, pvpTeammate.y);
-                pvpEnemies.forEach(e => {
-                    if(e.alive) ctx.fillText(e.icon, e.x, e.y);
-                });
+            // 5. Vẽ Đối Thủ Online (Người chơi 2)
+            if(remotePlayer.active) {
+                ctx.fillText(icons[remotePlayer.equipped] || '🧍', remotePlayer.x, remotePlayer.y);
+                ctx.font = '9px Arial'; ctx.fillStyle = '#e94560';
+                ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
             }
 
             // 6. Vẽ NPC Địch (Quái Đỏ)
@@ -599,31 +557,6 @@
         let isEngineRunning = false;
         function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
         function initGameEngine() { if (!isEngineRunning) { isEngineRunning = true; gameLoop(); } }
-
-        // --- DANH SÁCH PHÒNG PVP CÔNG KHAI ---
-        let defaultRooms = ["Phòng Siêu Cấp #1", "Đấu Trường Cyber #2", "Hội Con Ma #3"];
-        
-        function renderPvPRooms() {
-            let container = document.getElementById('pvp-room-list');
-            container.innerHTML = "";
-            defaultRooms.forEach((room, index) => {
-                container.innerHTML += `
-                    <div class="item-card">
-                        <div class="item-info">
-                            <div class="item-title">⚔️ ${room}</div>
-                            <div class="item-desc">Chế độ: 2v2 Arena | 🟢 Công khai</div>
-                        </div>
-                        <button class="btn-primary" style="width: 80px;" onclick="joinPvPRoom('${room}')">VÀO</button>
-                    </div>`;
-            });
-        }
-
-        function createPvPRoom() {
-            let roomName = "Phòng của " + currentAccount;
-            defaultRooms.unshift(roomName);
-            renderPvPRooms();
-            joinPvPRoom(roomName);
-        }
 
         // --- CHAT ---
         function sendChat() {
