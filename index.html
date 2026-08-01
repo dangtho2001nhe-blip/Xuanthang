@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Game Cyberpunk</title>
+    <title>Super Game Cyberpunk - PvP 2v2</title>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
         body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
@@ -24,7 +24,7 @@
         
         /* Navigation Tabs */
         .nav-bar { display: flex; gap: 5px; margin-bottom: 15px; background: #0f172a; padding: 5px; border-radius: 12px; }
-        .nav-btn { flex: 1; padding: 8px 2px; background: none; border: none; color: #8a8a8a; font-size: 12px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-btn { flex: 1; padding: 8px 2px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
         .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
         /* General Inputs & Buttons */
@@ -41,7 +41,7 @@
         button:disabled { background: #34495e !important; color: #7f8c8d !important; cursor: not-allowed; }
 
         .hidden { display: none !important; }
-        .money-box { font-size: 16px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; }
+        .money-box { font-size: 15px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
         /* Canvas Game & Overlay Menu */
         .canvas-container { position: relative; width: 100%; height: 200px; margin-bottom: 8px; }
@@ -49,7 +49,7 @@
         
         .game-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 11, 20, 0.85); border-radius: 12px;
+            background: rgba(5, 11, 20, 0.9); border-radius: 12px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             z-index: 10;
         }
@@ -64,10 +64,10 @@
         .dpad-down { grid-column: 2; grid-row: 3; }
         .action-btns { width: 55%; display: flex; flex-direction: column; gap: 4px; }
 
-        /* Item Cards (Shop & Balo) */
+        /* Item Cards & Room Cards */
         .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-info { text-align: left; }
-        .item-title { font-weight: bold; color: #00fff5; font-size: 14px; }
+        .item-title { font-weight: bold; color: #00fff5; font-size: 13px; }
         .item-desc { font-size: 11px; color: #aaa; }
 
         /* Chat Box */
@@ -96,14 +96,17 @@
 
     <!-- MAIN GAME PANEL -->
     <div id="game-panel" class="card hidden">
-        <div class="money-box">👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</div>
+        <div class="money-box">
+            <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
+            <button class="btn-danger" style="width: auto; padding: 2px 8px; margin:0; font-size:10px;" onclick="logout()">Đăng Xuất</button>
+        </div>
         
         <!-- NAV BAR -->
         <div class="nav-bar">
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
             <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
             <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
-            <button class="nav-btn" onclick="switchPage('pvp')">PVP</button>
+            <button class="nav-btn" onclick="switchPage('pvp')">PVP 2v2</button>
             <button class="nav-btn" onclick="switchPage('chat')">CHAT</button>
         </div>
 
@@ -112,10 +115,11 @@
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="200"></canvas>
                 
-                <!-- MENU CHỜ / GAME OVER OVERLAY -->
+                <!-- OVERLAY SẢNH CHỜ / PvP READY -->
                 <div id="menu-overlay" class="game-overlay">
-                    <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 10px;">SẢNH CHỜ</h3>
-                    <button class="btn-primary" style="width: 150px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
+                    <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
+                    <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
+                    <button id="start-game-btn" class="btn-primary" style="width: 150px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
                 </div>
             </div>
 
@@ -129,7 +133,6 @@
                 <div class="action-btns">
                     <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Không Có Skill</button>
                     <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
-                    <button class="btn-danger" onclick="logout()" style="padding: 5px;">Thoát Game</button>
                 </div>
             </div>
         </div>
@@ -141,21 +144,21 @@
                     <div class="item-title">👻 Con Ma</div>
                     <div class="item-desc">Skill: Bất tử 5s (Hồi 15s)</div>
                 </div>
-                <button id="buy-ghost-btn" class="btn-warning" style="width: 100px;" onclick="buyItem('ghost', 50)">50 Xu</button>
+                <button id="buy-ghost-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('ghost', 50)">50 Xu</button>
             </div>
             <div class="item-card">
                 <div class="item-info">
                     <div class="item-title">👾 Alien</div>
                     <div class="item-desc">Skill: Vòng Năng Lượng 20s</div>
                 </div>
-                <button id="buy-alien-btn" class="btn-warning" style="width: 100px;" onclick="buyItem('alien', 80)">80 Xu</button>
+                <button id="buy-alien-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('alien', 80)">80 Xu</button>
             </div>
             <div class="item-card">
                 <div class="item-info">
                     <div class="item-title">🐱 Mèo</div>
                     <div class="item-desc">Skill: Cào Chết NPC Gần</div>
                 </div>
-                <button id="buy-cat-btn" class="btn-warning" style="width: 100px;" onclick="buyItem('cat', 123)">123 Xu</button>
+                <button id="buy-cat-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('cat', 123)">123 Xu</button>
             </div>
         </div>
 
@@ -164,17 +167,11 @@
             <div id="inventory-list"></div>
         </div>
 
-        <!-- 4. PVP TAB -->
+        <!-- 4. PVP 2v2 TAB -->
         <div id="tab-pvp" class="page-tab hidden">
-            <p style="font-size: 13px; color: #aaa;">Đang tìm đối thủ trong khu vực...</p>
-            <div class="item-card">
-                <div class="item-info">
-                    <div class="item-title">⚔️ Đấu Trường 1v1</div>
-                    <div class="item-desc">Thách đấu ngẫu nhiên</div>
-                </div>
-                <button class="btn-danger" style="width: 100px;" onclick="startPVP()">CHẾT BỎ</button>
-            </div>
-            <p id="pvp-result" style="font-weight: bold; color: #00fff5; margin-top: 15px;"></p>
+            <button class="btn-success" style="margin-bottom: 10px;" onclick="createPvPRoom()">➕ Tạo Phòng 2v2 Mới</button>
+            <div style="font-size: 12px; color: #00fff5; text-align: left; margin-bottom: 5px;">🌐 Danh Sách Phòng Công Khai:</div>
+            <div id="pvp-room-list" style="max-height: 180px; overflow-y: auto;"></div>
         </div>
 
         <!-- 5. CHAT TAB -->
@@ -194,6 +191,23 @@
         let currentAccount = null;
         let userData = { money: 0, inventory: ['human'], equipped: 'human' };
 
+        // --- TỰ ĐỘNG ĐĂNG NHẬP KHI MỞ LẠI WEB ---
+        window.onload = function() {
+            let savedAccount = localStorage.getItem('last_logged_user');
+            if(savedAccount) {
+                let data = localStorage.getItem('acc_' + savedAccount);
+                if(data) {
+                    currentAccount = savedAccount;
+                    userData = JSON.parse(data);
+                    document.getElementById('auth-panel').classList.add('hidden');
+                    document.getElementById('game-panel').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = savedAccount;
+                    updateUI();
+                    initGameEngine();
+                }
+            }
+        };
+
         // --- AUTH ---
         function handleAuth(type) {
             let u = document.getElementById('username').value.trim();
@@ -205,7 +219,7 @@
                 if(localStorage.getItem('acc_' + u)) return st.innerText = "Tài khoản đã tồn tại!";
                 let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human' };
                 localStorage.setItem('acc_' + u, JSON.stringify(newData));
-                st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công! Hãy bấm Đăng Nhập.";
+                st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công!";
             } else {
                 let data = localStorage.getItem('acc_' + u);
                 if(!data) return st.innerText = "Tài khoản không tồn tại!";
@@ -214,12 +228,19 @@
                 
                 currentAccount = u;
                 userData = parsed;
+                localStorage.setItem('last_logged_user', u); // Lưu tự động đăng nhập
+
                 document.getElementById('auth-panel').classList.add('hidden');
                 document.getElementById('game-panel').classList.remove('hidden');
                 document.getElementById('user-display').innerText = u;
                 updateUI();
                 initGameEngine();
             }
+        }
+
+        function logout() {
+            localStorage.removeItem('last_logged_user');
+            location.reload();
         }
 
         function saveData() {
@@ -231,6 +252,7 @@
             updateShopUI();
             updateBaloUI();
             updateSkillButton();
+            renderPvPRooms();
         }
 
         // --- NAVIGATION ---
@@ -268,13 +290,7 @@
         function updateBaloUI() {
             let list = document.getElementById('inventory-list');
             list.innerHTML = "";
-            
-            const names = { 
-                human: "🧍 Người Bình Thường", 
-                ghost: "👻 Con Ma (Bất Tử)", 
-                alien: "👾 Alien (Vòng Năng Lượng)",
-                cat: "🐱 Mèo (Cào Cận Chiến)"
-            };
+            const names = { human: "🧍 Người Bình Thường", ghost: "👻 Con Ma (Bất Tử)", alien: "👾 Alien (Vòng Năng Lượng)", cat: "🐱 Mèo (Cào Cận Chiến)" };
 
             userData.inventory.forEach(item => {
                 let isEquipped = userData.equipped === item;
@@ -284,7 +300,7 @@
                             <div class="item-title">${names[item]}</div>
                             <div class="item-desc">${isEquipped ? '🟢 Đang Trang Bị' : '⚪ Trong Balo'}</div>
                         </div>
-                        <button class="${isEquipped ? 'btn-success' : 'btn-primary'}" style="width: 100px;" ${isEquipped ? 'disabled' : ''} onclick="equipItem('${item}')">
+                        <button class="${isEquipped ? 'btn-success' : 'btn-primary'}" style="width: 90px;" ${isEquipped ? 'disabled' : ''} onclick="equipItem('${item}')">
                             ${isEquipped ? 'ĐANG DÙNG' : 'TRANG BỊ'}
                         </button>
                     </div>`;
@@ -301,25 +317,12 @@
         let skillCD = false;
         function updateSkillButton() {
             let btn = document.getElementById('skillBtn');
-            if(!isGamePlaying) {
-                btn.innerText = "🔒 Bấm Play Để Dùng";
-                btn.disabled = true;
-                return;
-            }
+            if(!isGamePlaying) { btn.innerText = "🔒 Bấm Play Để Dùng"; btn.disabled = true; return; }
 
-            if(userData.equipped === 'human') {
-                btn.innerText = "🔒 Không Có Skill";
-                btn.disabled = true;
-            } else if(userData.equipped === 'ghost') {
-                btn.innerText = "👻 Bất Tử (15s)";
-                btn.disabled = skillCD;
-            } else if(userData.equipped === 'alien') {
-                btn.innerText = "👾 Vòng Tròn (36s)";
-                btn.disabled = skillCD;
-            } else if(userData.equipped === 'cat') {
-                btn.innerText = "🐱 Cào NPC (8s)";
-                btn.disabled = skillCD;
-            }
+            if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
+            else if(userData.equipped === 'ghost') { btn.innerText = "👻 Bất Tử (15s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'alien') { btn.innerText = "👾 Vòng Tròn (36s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'cat') { btn.innerText = "🐱 Cào NPC (8s)"; btn.disabled = skillCD; }
         }
 
         function useActiveSkill() {
@@ -351,19 +354,25 @@
             let cd = setInterval(() => {
                 timer--;
                 if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
-                else {
-                    clearInterval(cd);
-                    skillCD = false;
-                    updateSkillButton();
-                }
+                else { clearInterval(cd); skillCD = false; updateSkillButton(); }
             }, 1000);
         }
 
-        // --- GAME ENGINE ---
+        // --- GAME ENGINE & PVP LOGIC ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         let moveState = { up: false, down: false, left: false, right: false };
-        let player = { x: 180, y: 100, radius: 12, speed: 2.5 };
+        
+        let player = { x: 180, y: 150, radius: 10, speed: 2.2 };
+        let isPVPMode = false;
+        
+        // 2v2 Players Data
+        let pvpTeammate = { x: 140, y: 150, radius: 10, icon: '👾', alive: true };
+        let pvpEnemies = [
+            { x: 140, y: 30, radius: 10, icon: '🐱', alive: true },
+            { x: 180, y: 30, radius: 10, icon: '👻', alive: true }
+        ];
+
         let alienShield = { active: false, radius: 45 };
         let ghostInvincible = { active: false };
         let catSlashEffect = 0;
@@ -376,45 +385,85 @@
         function stopMove(d) { moveState[d] = false; }
 
         function startGameSession() {
+            isPVPMode = false;
             isGamePlaying = true;
-            player.x = 180; player.y = 100; // Reset vị trí người chơi
+            player.x = 180; player.y = 100;
             droppedCoins = [];
-            ghostInvincible.active = false;
-            alienShield.active = false;
-
             document.getElementById('menu-overlay').classList.add('hidden');
             
-            // Spawn 2 - 4 NPC
             npcs = [];
             let count = Math.floor(Math.random() * 3) + 2;
             for(let i = 0; i < count; i++) {
                 npcs.push({ x: Math.random() * (canvas.width - 20) + 10, y: Math.random() * (canvas.height - 20) + 10, radius: 8, speed: 0.9 + Math.random() * 0.3 });
             }
-
             scheduleNextCoin();
             updateSkillButton();
         }
 
-        function stopGameSession(titleText = 'SẢNH CHỜ') {
+        function stopGameSession(titleText = 'SẢNH CHỜ', subText = '') {
             isGamePlaying = false;
             let overlay = document.getElementById('menu-overlay');
-            let title = document.getElementById('overlay-title');
-            title.innerText = titleText;
+            document.getElementById('overlay-title').innerText = titleText;
+            document.getElementById('overlay-sub').innerText = subText;
+            document.getElementById('start-game-btn').classList.remove('hidden');
             overlay.classList.remove('hidden');
             clearTimeout(coinSpawnTimer);
             updateSkillButton();
         }
 
+        // --- ĐẾM NGƯỢC 3S VÀO TRẬN PVP 2v2 ---
+        function joinPvPRoom(roomName) {
+            switchPage('play');
+            let overlay = document.getElementById('menu-overlay');
+            let title = document.getElementById('overlay-title');
+            let sub = document.getElementById('overlay-sub');
+            let btn = document.getElementById('start-game-btn');
+            
+            btn.classList.add('hidden');
+            overlay.classList.remove('hidden');
+            
+            let count = 3;
+            sub.innerText = "Phòng: " + roomName + " (2v2 Arena)";
+            title.innerText = "⏱️ CHUẨN BỊ: " + count + "s";
+
+            let timer = setInterval(() => {
+                count--;
+                if(count > 0) {
+                    title.innerText = "⏱️ CHUẨN BỊ: " + count + "s";
+                } else {
+                    clearInterval(timer);
+                    startPvPMatch();
+                }
+            }, 1000);
+        }
+
+        function startPvPMatch() {
+            isPVPMode = true;
+            isGamePlaying = true;
+            document.getElementById('menu-overlay').classList.add('hidden');
+
+            // Reset Đội 2v2
+            player.x = 220; player.y = 160;
+            pvpTeammate = { x: 140, y: 160, radius: 10, icon: '👾', alive: true };
+            pvpEnemies = [
+                { x: 140, y: 40, radius: 10, icon: '🐱', alive: true },
+                { x: 220, y: 40, radius: 10, icon: '👻', alive: true }
+            ];
+
+            // Quái Đuổi Theo Tất Cả
+            npcs = [];
+            for(let i = 0; i < 4; i++) {
+                npcs.push({ x: Math.random() * canvas.width, y: 100, radius: 8, speed: 1.1 });
+            }
+            updateSkillButton();
+        }
+
         function scheduleNextCoin() {
-            if(!isGamePlaying) return;
+            if(!isGamePlaying || isPVPMode) return;
             let time = (Math.floor(Math.random() * 4) + 3) * 1000;
             coinSpawnTimer = setTimeout(() => {
                 if(isGamePlaying) {
-                    droppedCoins.push({
-                        x: Math.random() * (canvas.width - 40) + 20,
-                        y: Math.random() * (canvas.height - 40) + 20,
-                        value: Math.floor(Math.random() * 26) + 1
-                    });
+                    droppedCoins.push({ x: Math.random() * (canvas.width - 40) + 20, y: Math.random() * (canvas.height - 40) + 20, value: Math.floor(Math.random() * 26) + 1 });
                     scheduleNextCoin();
                 }
             }, time);
@@ -423,92 +472,127 @@
         function updateGame() {
             if(!isGamePlaying) return;
 
-            // Di chuyển Player
+            // Player di chuyển
             if (moveState.up && player.y - player.radius > 0) player.y -= player.speed;
             if (moveState.down && player.y + player.radius < canvas.height) player.y += player.speed;
             if (moveState.left && player.x - player.radius > 0) player.x -= player.speed;
             if (moveState.right && player.x + player.radius < canvas.width) player.x += player.speed;
 
-            // Xử lý Ăn Xu
+            // Logique PvP 2v2 AI Di chuyển nhẹ
+            if(isPVPMode) {
+                if(pvpTeammate.alive) pvpTeammate.x += (Math.random() - 0.5) * 1.5;
+                pvpEnemies.forEach(e => {
+                    if(e.alive) { e.x += (Math.random() - 0.5) * 2; e.y += (Math.random() - 0.5) * 1.5; }
+                });
+            }
+
+            // Ăn Xu
             droppedCoins = droppedCoins.filter(coin => {
                 let dx = player.x - coin.x, dy = player.y - coin.y;
                 if(Math.sqrt(dx * dx + dy * dy) < player.radius + 10) {
-                    userData.money += coin.value;
-                    saveData();
-                    updateUI();
-                    return false;
+                    userData.money += coin.value; saveData(); updateUI(); return false;
                 }
                 return true;
             });
 
-            // Xử lý NPC đuổi theo & Va chạm
+            // NPC di chuyển & Va chạm
             npcs.forEach(npc => {
-                let dx = player.x - npc.x, dy = player.y - npc.y;
+                // Tìm mục tiêu gần nhất giữa các người chơi
+                let target = player;
+                let minDist = Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2);
+
+                if(isPVPMode) {
+                    if(pvpTeammate.alive) {
+                        let d = Math.sqrt((pvpTeammate.x - npc.x)**2 + (pvpTeammate.y - npc.y)**2);
+                        if(d < minDist) { minDist = d; target = pvpTeammate; }
+                    }
+                    pvpEnemies.forEach(e => {
+                        if(e.alive) {
+                            let d = Math.sqrt((e.x - npc.x)**2 + (e.y - npc.y)**2);
+                            if(d < minDist) { minDist = d; target = e; }
+                        }
+                    });
+                }
+
+                let dx = target.x - npc.x, dy = target.y - npc.y;
                 let dist = Math.sqrt(dx * dx + dy * dy);
 
-                // Nếu bật Skill Alien (Vòng đẩy)
-                if (alienShield.active && userData.equipped === 'alien') {
-                    if (dist < alienShield.radius + npc.radius) {
-                        let angle = Math.atan2(dy, dx);
-                        npc.x = player.x - Math.cos(angle) * (alienShield.radius + npc.radius);
-                        npc.y = player.y - Math.sin(angle) * (alienShield.radius + npc.radius);
+                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
+
+                // XỬ LÝ CHẾT TRONG PVP 2v2
+                if(isPVPMode) {
+                    // Check đối thủ bị quái chạm -> Chết
+                    pvpEnemies.forEach(e => {
+                        if(e.alive && Math.sqrt((e.x - npc.x)**2 + (e.y - npc.y)**2) < e.radius + npc.radius) {
+                            e.alive = false;
+                        }
+                    });
+                    // Check đồng đội bị chạm -> Chết
+                    if(pvpTeammate.alive && Math.sqrt((pvpTeammate.x - npc.x)**2 + (pvpTeammate.y - npc.y)**2) < pvpTeammate.radius + npc.radius) {
+                        pvpTeammate.alive = false;
+                    }
+
+                    // Điều kiện Thắng / Thua PvP: Đội nào chết sạch trước thì thua
+                    let enemiesDead = pvpEnemies.every(e => !e.alive);
+                    let teamDead = (!pvpTeammate.alive) && (dist < player.radius + npc.radius);
+
+                    if(enemiesDead) {
+                        userData.money += 30; saveData(); updateUI();
+                        stopGameSession('🏆 ĐỘI BẠN CHIẾN THẮNG PVP!', 'Nhận thưởng: +30 Xu');
                         return;
                     }
                 }
 
-                // KIỂM TRA VA CHẠM / CHẾT
-                // Trừ khi đang bật Skill Ma Bất Tử
+                // Va chạm Player chính
                 if (dist < player.radius + npc.radius) {
                     if (!(ghostInvincible.active && userData.equipped === 'ghost')) {
-                        stopGameSession('💀 BẠN ĐÃ CHẾT!');
+                        stopGameSession('💀 BẠN ĐÃ CHẾT!', isPVPMode ? 'Đội bạn đã thất bại!' : '');
                         return;
                     }
                 }
-
-                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
             });
         }
 
         function drawGame() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 1. Vẽ Xu Trên Đất
+            // 1. Vẽ Xu
             droppedCoins.forEach(coin => {
-                ctx.fillStyle = '#f1c40f';
-                ctx.beginPath(); ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center';
-                ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
+                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
             });
 
-            // 2. Vẽ Vòng Alien
+            // 2. Vẽ Skill Alien
             if (alienShield.active && userData.equipped === 'alien') {
                 ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill();
-                ctx.strokeStyle = '#00ffcc'; ctx.stroke();
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
             }
 
-            // 3. Hiệu ứng vệt cào Mèo
+            // 3. Hiệu ứng Mèo
             if(catSlashEffect > 0) {
-                ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(player.x - 30, player.y - 30); ctx.lineTo(player.x + 30, player.y + 30);
-                ctx.moveTo(player.x - 20, player.y - 35); ctx.lineTo(player.x + 35, player.y + 20);
-                ctx.stroke(); catSlashEffect--;
+                ctx.strokeStyle = '#e94560'; ctx.lineWidth = 3; ctx.beginPath();
+                ctx.moveTo(player.x - 30, player.y - 30); ctx.lineTo(player.x + 30, player.y + 30); ctx.stroke(); catSlashEffect--;
             }
 
-            // 4. Vẽ Nhân Vật Dùng Emoji / Icon
+            // 4. Vẽ Người Chơi Chính
             ctx.save();
             if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
-
-            ctx.font = '22px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
             let icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱' };
             ctx.fillText(icons[userData.equipped] || '🧍', player.x, player.y);
             ctx.restore();
 
-            // 5. Vẽ NPC Địch
+            // 5. Vẽ Đồng Đội & Đối Thủ Trong PvP 2v2
+            if(isPVPMode) {
+                if(pvpTeammate.alive) ctx.fillText(pvpTeammate.icon, pvpTeammate.x, pvpTeammate.y);
+                pvpEnemies.forEach(e => {
+                    if(e.alive) ctx.fillText(e.icon, e.x, e.y);
+                });
+            }
+
+            // 6. Vẽ NPC Địch (Quái Đỏ)
             npcs.forEach(npc => {
-                ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#ff4757'; ctx.fill();
+                ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
             });
         }
 
@@ -516,31 +600,39 @@
         function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
         function initGameEngine() { if (!isEngineRunning) { isEngineRunning = true; gameLoop(); } }
 
-        // --- CHAT & PVP ---
+        // --- DANH SÁCH PHÒNG PVP CÔNG KHAI ---
+        let defaultRooms = ["Phòng Siêu Cấp #1", "Đấu Trường Cyber #2", "Hội Con Ma #3"];
+        
+        function renderPvPRooms() {
+            let container = document.getElementById('pvp-room-list');
+            container.innerHTML = "";
+            defaultRooms.forEach((room, index) => {
+                container.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-title">⚔️ ${room}</div>
+                            <div class="item-desc">Chế độ: 2v2 Arena | 🟢 Công khai</div>
+                        </div>
+                        <button class="btn-primary" style="width: 80px;" onclick="joinPvPRoom('${room}')">VÀO</button>
+                    </div>`;
+            });
+        }
+
+        function createPvPRoom() {
+            let roomName = "Phòng của " + currentAccount;
+            defaultRooms.unshift(roomName);
+            renderPvPRooms();
+            joinPvPRoom(roomName);
+        }
+
+        // --- CHAT ---
         function sendChat() {
             let inp = document.getElementById('chat-input');
             if(!inp.value.trim()) return;
             let box = document.getElementById('chat-messages');
             box.innerHTML += `<div class="chat-msg"><span class="chat-user">${currentAccount}:</span> ${inp.value}</div>`;
-            inp.value = "";
-            box.scrollTop = box.scrollHeight;
+            inp.value = ""; box.scrollTop = box.scrollHeight;
         }
-
-        function startPVP() {
-            let res = document.getElementById('pvp-result');
-            res.innerText = "⚔️ Đang chiến đấu...";
-            setTimeout(() => {
-                let win = Math.random() > 0.5;
-                if(win) {
-                    userData.money += 10; saveData(); updateUI();
-                    res.innerText = "🎉 BẠN ĐÃ THẮNG! (+10 Xu)";
-                } else {
-                    res.innerText = "💀 BẠN ĐÃ THUA!";
-                }
-            }, 1500);
-        }
-
-        function logout() { location.reload(); }
     </script>
 </body>
 </html>
