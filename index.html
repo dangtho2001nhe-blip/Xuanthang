@@ -87,11 +87,9 @@
 </head>
 <body>
 
-    <!-- MEDIA ẨN -->
     <video id="catSkillVideo" src="Cat.MOV" playsinline muted style="display:none;"></video>
     <audio id="bgMusic" src="music.MOV" style="display:none;"></audio>
 
-    <!-- AUTH PANEL -->
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
         <div class="input-group">
@@ -107,7 +105,6 @@
         <p id="status" style="font-size: 12px; color: #ff4757;"></p>
     </div>
 
-    <!-- MAIN GAME PANEL -->
     <div id="game-panel" class="card hidden">
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
@@ -115,7 +112,6 @@
             <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
         </div>
         
-        <!-- NAV BAR -->
         <div class="nav-bar">
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
             <button class="nav-btn" onclick="switchPage('rank')">XẾP HẠNG</button>
@@ -125,12 +121,10 @@
             <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
         </div>
 
-        <!-- 1. PLAY TAB -->
         <div id="tab-play" class="page-tab">
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="210"></canvas>
                 
-                <!-- BỘ ĐẾM THỜI GIAN SỐNG SÓT -->
                 <div class="timer-display">⏱️ <span id="gameTimer">00:00</span></div>
 
                 <div id="menu-overlay" class="game-overlay">
@@ -154,7 +148,6 @@
                 </div>
             </div>
 
-            <!-- CHAT TRỰC TIẾP TRONG GAME -->
             <div class="chat-box" id="in-game-chat">
                 <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Khung chat trực tiếp trong trận đấu.</div>
             </div>
@@ -166,7 +159,6 @@
             <div class="guide-text">🎮 TV/PC: Mũi tên (Di chuyển) | Phím 1 (Skill 1) | Phím 2 (Skill 2)</div>
         </div>
 
-        <!-- 2. BẢNG XẾP HẠNG TAB -->
         <div id="tab-rank" class="page-tab hidden">
             <h3 style="color: #00fff5; margin-top: 5px;">🏆 BẢNG XẾP HẠNG THỜI GIAN SỐNG SÓT</h3>
             <table class="lb-table">
@@ -181,7 +173,6 @@
             </table>
         </div>
 
-        <!-- 3. SHOP TAB -->
         <div id="tab-shop" class="page-tab hidden">
             <div class="item-card">
                 <div class="item-info">
@@ -199,8 +190,8 @@
             </div>
             <div class="item-card">
                 <div class="item-info">
-                    <div class="item-title">🐱 Mèo (Hoạt Ảnh To)</div>
-                    <div class="item-desc">Skill: Trảm Cào To Bằng NPC</div>
+                    <div class="item-title">🐱 Mèo</div>
+                    <div class="item-desc">Skill: Trảm Cào Kích Thước NPC (Giết 1 Quái)</div>
                 </div>
                 <button id="buy-cat-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('cat', 123)">123 Xu</button>
             </div>
@@ -227,12 +218,10 @@
             </div>
         </div>
 
-        <!-- 4. BALO TAB -->
         <div id="tab-balo" class="page-tab hidden">
             <div id="inventory-list"></div>
         </div>
 
-        <!-- 5. GIFTCODE TAB -->
         <div id="tab-code" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 12px; color: #00fff5; margin-bottom: 8px;">NHẬP MÃ QUÀ TẶNG GIFTCODE</p>
@@ -241,7 +230,6 @@
             </div>
         </div>
 
-        <!-- 6. ONLINE MULTIPLAYER TAB -->
         <div id="tab-pvp" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
@@ -430,7 +418,7 @@
                 human: "🧍 Người Bình Thường", 
                 ghost: "👻 Con Ma (Bất Tử)", 
                 alien: "👾 Alien (Vòng Năng Lượng)", 
-                cat: "🐱 Mèo (Hoạt Ảnh Skill Cực To)",
+                cat: "🐱 Mèo (Hoạt Ảnh Vừa Vặn Quái)",
                 witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)",
                 music: "🎶 Âm Nhạc (Dịch Chuyển + Nhạc)",
                 twotime: "👼 Two-Time (Nghi Lễ Hồi Sinh + Tàng Hình)"
@@ -563,11 +551,11 @@
 
                 if (closestNpcIndex !== -1) {
                     let npc = npcs[closestNpcIndex];
-                    // Tạo hiệu ứng trảm tại vị trí NPC
-                    slashEffects.push({ x: npc.x, y: npc.y, frame: 0, maxFrame: 45 });
+                    // Tạo hiệu ứng trảm đúng vị trí NPC bị tiêu diệt
+                    slashEffects.push({ x: npc.x, y: npc.y, frame: 0, maxFrame: 30 });
                     npcs.splice(closestNpcIndex, 1);
                 } else {
-                    slashEffects.push({ x: player.x, y: player.y, frame: 0, maxFrame: 45 });
+                    slashEffects.push({ x: player.x, y: player.y, frame: 0, maxFrame: 30 });
                 }
 
                 catVideo.currentTime = 0;
@@ -879,8 +867,9 @@
 
             slashEffects.forEach((eff) => {
                 ctx.save();
-                // PHÓNG TO HOẠT ẢNH SKILL MÈO LÊN 200x200 (CỰC TO PHỦ KÍN VÙNG NPC)
-                ctx.drawImage(processCanvas, eff.x - 100, eff.y - 100, 200, 200);
+                // CHỈNH KÍCH THƯỚC VỪA BẰNG NPC QUÁI (24x24 pixel, khớp hoàn toàn với vị trí NPC)
+                const npcSize = 24; 
+                ctx.drawImage(processCanvas, eff.x - npcSize/2, eff.y - npcSize/2, npcSize, npcSize);
                 ctx.restore();
                 eff.frame++;
             });
@@ -992,7 +981,7 @@
                 ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
             }
 
-            // Vẽ NPC (Quái vật)
+            // Vẽ NPC (Quái vật - Bán kính radius = 8px => Đường kính = 16px)
             npcs.forEach(npc => {
                 ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
             });
