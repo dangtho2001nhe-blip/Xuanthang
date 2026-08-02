@@ -2,56 +2,55 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Cyber Game - Multi-Device, Leaderboard & Audio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Super Cyber Game - Multi-Device, Leaderboard & Two-Time Updated</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
-        
-        /* HÌNH NỀN PHỦ TOÀN BỘ MÀN HÌNH BÊN NGOÀI */
-        body { 
-            background-image: url('image.jpeg'); 
-            background-size: cover; 
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-attachment: fixed;
-            color: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            margin: 0; 
-            padding: 10px; 
-        }
+        body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
         /* CARD DÙNG CHUNG */
         .card { 
-            background: rgba(22, 33, 62, 0.95); 
-            padding: 15px; 
-            border-radius: 20px; 
-            width: 100%; 
-            max-width: 420px; 
-            text-align: center; 
-            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); 
-            border: 1px solid rgba(0, 255, 245, 0.3); 
-            position: relative;
+            background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; 
+            box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); border: 1px solid rgba(0, 255, 245, 0.3); position: relative;
         }
 
-        /* KHUNG ĐĂNG NHẬP TRONG SUỐT NHÌN XUYÊN RA HÌNH NỀN */
+        /* KHU VỰC ĐĂNG NHẬP CÓ HÌNH NỀN */
         #auth-panel {
+            background-image: url('image.png'); /* Sử dụng tệp ảnh nền */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Lớp phủ mờ giúp chữ và form nổi bật dễ đọc */
+        #auth-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(10, 10, 22, 0.65);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+
+        #auth-panel * {
+            position: relative;
+            z-index: 2;
         }
 
         h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
         
+        /* Navigation Tabs */
         .nav-bar { display: flex; gap: 4px; margin-bottom: 12px; background: #0f172a; padding: 4px; border-radius: 12px; overflow-x: auto; }
-        .nav-btn { flex: 1; padding: 7px 4px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; white-space: nowrap; }
+        .nav-btn { flex: 1; padding: 7px 4px; background: none; border: none; color: #8a8a8a; font-size: 11px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; whitespace: nowrap; }
         .nav-btn.active { background: #00fff5; color: #0a0a16; box-shadow: 0 0 10px rgba(0, 255, 245, 0.5); }
 
+        /* General Inputs & Buttons */
         .input-group { margin-bottom: 10px; text-align: left; }
         .input-group label { display: block; font-size: 11px; color: #a29bfe; margin-bottom: 4px; }
         input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: rgba(15, 23, 42, 0.85); color: #fff; outline: none; }
@@ -68,6 +67,7 @@
         .hidden { display: none !important; }
         .money-box { font-size: 13px; font-weight: bold; color: #f1c40f; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
 
+        /* Canvas Game & Overlay Menu */
         .canvas-container { position: relative; width: 100%; height: 210px; margin-bottom: 8px; }
         canvas { background: #050b14; border-radius: 12px; border: 2px solid #00fff5; width: 100%; height: 100%; display: block; }
         
@@ -83,6 +83,7 @@
             z-index: 10;
         }
 
+        /* Controls */
         .controls-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .dpad { display: grid; grid-template-columns: repeat(3, 38px); grid-template-rows: repeat(3, 38px); gap: 3px; }
         .dpad-btn { background: #0f3460; border: 1px solid #00fff5; color: #fff; font-size: 14px; border-radius: 6px; display: flex; justify-content: center; align-items: center; cursor: pointer; }
@@ -92,6 +93,7 @@
         .dpad-down { grid-column: 2; grid-row: 3; }
         .action-btns { width: 58%; display: flex; flex-direction: column; gap: 4px; }
 
+        /* Item Cards & Room Info */
         .item-card { background: #0f172a; border: 1px solid #1f4068; padding: 10px; border-radius: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
         .item-info { text-align: left; }
         .item-title { font-weight: bold; color: #00fff5; font-size: 13px; }
@@ -99,10 +101,12 @@
         
         .room-box { background: #0f172a; padding: 10px; border-radius: 10px; margin-bottom: 10px; border: 1px dashed #00fff5; text-align: center; }
 
+        /* Chat Box */
         .chat-box { background: #0f172a; border: 1px solid #1f4068; height: 110px; border-radius: 10px; padding: 8px; overflow-y: auto; text-align: left; font-size: 11px; margin-bottom: 6px; }
         .chat-msg { margin-bottom: 4px; word-break: break-all; }
         .chat-user { color: #00fff5; font-weight: bold; }
 
+        /* Leaderboard Table */
         .lb-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 12px; }
         .lb-table th { background: #0f172a; color: #00fff5; padding: 6px; border-bottom: 2px solid #1f4068; }
         .lb-table td { padding: 6px; border-bottom: 1px solid #1f4068; }
@@ -111,6 +115,9 @@
     </style>
 </head>
 <body>
+
+    <video id="catSkillVideo" src="Cat.MOV" playsinline muted style="display:none;"></video>
+    <audio id="bgMusic" src="music.MOV" style="display:none;"></audio>
 
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
@@ -122,9 +129,910 @@
             <label>Mật Khẩu</label>
             <input type="password" id="password" placeholder="Nhập mật khẩu...">
         </div>
-        <button class="btn-primary" onclick="login()">ĐĂNG NHẬP</button>
-        <button class="btn-success" onclick="register()">ĐĂNG KÝ</button>
+        <button class="btn-primary" onclick="handleAuth('login')">ĐĂNG NHẬP</button>
+        <button class="btn-success" onclick="handleAuth('register')">ĐĂNG KÝ</button>
+        <p id="status" style="font-size: 12px; color: #ff4757; margin-top: 8px; font-weight: bold;"></p>
     </div>
 
-    </body>
+    <div id="game-panel" class="card hidden">
+        <div class="money-box">
+            <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
+            <span>🏆 Kỷ lục: <span id="best-time-display" style="color:#00fff5;">0s</span></span>
+            <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
+        </div>
+        
+        <div class="nav-bar">
+            <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
+            <button class="nav-btn" onclick="switchPage('rank')">XẾP HẠNG</button>
+            <button class="nav-btn" onclick="switchPage('shop')">SHOP</button>
+            <button class="nav-btn" onclick="switchPage('balo')">BALO</button>
+            <button class="nav-btn" onclick="switchPage('code')">CODE</button>
+            <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
+        </div>
+
+        <div id="tab-play" class="page-tab">
+            <div class="canvas-container">
+                <canvas id="gameCanvas" width="360" height="210"></canvas>
+                
+                <div class="timer-display">⏱️ <span id="gameTimer">00:00</span></div>
+
+                <div id="menu-overlay" class="game-overlay">
+                    <h3 id="overlay-title" style="color: #00fff5; margin-bottom: 5px;">SẢNH CHỜ</h3>
+                    <p id="overlay-sub" style="font-size: 12px; color: #aaa; margin-bottom: 10px;"></p>
+                    <button id="start-game-btn" class="btn-primary" style="width: 160px;" onclick="startGameSession()">▶️ BẮT ĐẦU CHƠI</button>
+                </div>
+            </div>
+
+            <div class="controls-container">
+                <div class="dpad">
+                    <div class="dpad-btn dpad-up" ontouchstart="startMove('up')" ontouchend="stopMove('up')" onmousedown="startMove('up')" onmouseup="stopMove('up')">▲</div>
+                    <div class="dpad-btn dpad-left" ontouchstart="startMove('left')" ontouchend="stopMove('left')" onmousedown="startMove('left')" onmouseup="stopMove('left')">◀</div>
+                    <div class="dpad-btn dpad-right" ontouchstart="startMove('right')" ontouchend="stopMove('right')" onmousedown="startMove('right')" onmouseup="stopMove('right')">▶</div>
+                    <div class="dpad-btn dpad-down" ontouchstart="startMove('down')" ontouchend="stopMove('down')" onmousedown="startMove('down')" onmouseup="stopMove('down')">▼</div>
+                </div>
+                <div class="action-btns">
+                    <button id="skillBtn" class="btn-primary" onclick="useActiveSkill()" disabled>🔒 Skill 1 (Phím 1)</button>
+                    <button id="skill2Btn" class="btn-music hidden" onclick="useSkill2()" disabled>🎵 Skill 2 (Phím 2)</button>
+                    <button class="btn-danger" onclick="stopGameSession('SẢNH CHỜ')" style="padding: 5px;">⏸️ Tạm Dừng / Menu</button>
+                </div>
+            </div>
+
+            <div class="chat-box" id="in-game-chat">
+                <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Khung chat trực tiếp trong trận đấu.</div>
+            </div>
+            <div style="display: flex; gap: 5px;">
+                <input type="text" id="chat-input" placeholder="Nhập tin nhắn...">
+                <button class="btn-primary" style="width: 70px; margin: 0; padding: 6px;" onclick="sendChat()">GỬI</button>
+            </div>
+
+            <div class="guide-text">🎮 TV/PC: Mũi tên (Di chuyển) | Phím 1 (Skill 1) | Phím 2 (Skill 2)</div>
+        </div>
+
+        <div id="tab-rank" class="page-tab hidden">
+            <h3 style="color: #00fff5; margin-top: 5px;">🏆 BẢNG XẾP HẠNG THỜI GIAN SỐNG SÓT</h3>
+            <table class="lb-table">
+                <thead>
+                    <tr>
+                        <th>Hạng</th>
+                        <th>Tài Khoản</th>
+                        <th>Kỷ Lục</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body"></tbody>
+            </table>
+        </div>
+
+        <div id="tab-shop" class="page-tab hidden">
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">👻 Con Ma</div>
+                    <div class="item-desc">Skill: Bất tử 5s (Hồi 15s)</div>
+                </div>
+                <button id="buy-ghost-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('ghost', 50)">50 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">👾 Alien</div>
+                    <div class="item-desc">Skill: Vòng Năng Lượng 20s</div>
+                </div>
+                <button id="buy-alien-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('alien', 80)">80 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🐱 Mèo</div>
+                    <div class="item-desc">Skill: Trảm Cào Kích Thước NPC (Giết 1 Quái)</div>
+                </div>
+                <button id="buy-cat-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('cat', 123)">123 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🪼 Phù Thủy</div>
+                    <div class="item-desc">Skill: Đẩy NPC Ra Xa (Hồi 6s)</div>
+                </div>
+                <button id="buy-witch-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('witch', 150)">150 Xu</button>
+            </div>
+            <div class="item-card">
+                <div class="item-info">
+                    <div class="item-title">🎶 Âm Nhạc</div>
+                    <div class="item-desc">C1: Dịch chuyển xa NPC (23s)<br>C2: Phát nhạc (300s)</div>
+                </div>
+                <button id="buy-music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('music', 200)">200 Xu</button>
+            </div>
+            <div class="item-card" style="border: 1px solid #fdcb6e;">
+                <div class="item-info">
+                    <div class="item-title" style="color:#fdcb6e;">👼 Two-Time (Độc Quyền)</div>
+                    <div class="item-desc">C1: Đặt Nghi Lễ Hồi Sinh Quay Lại<br>C2: Tàng Hình (Dùng Được Cả 2 Mạng)</div>
+                </div>
+                <button class="btn-danger" style="width: 90px; font-size:11px;" disabled>GIFTCODE</button>
+            </div>
+        </div>
+
+        <div id="tab-balo" class="page-tab hidden">
+            <div id="inventory-list"></div>
+        </div>
+
+        <div id="tab-code" class="page-tab hidden">
+            <div class="room-box">
+                <p style="font-size: 12px; color: #00fff5; margin-bottom: 8px;">NHẬP MÃ QUÀ TẶNG GIFTCODE</p>
+                <input type="text" id="giftcode-input" placeholder="Nhập mã tại đây..." style="text-align: center; font-weight: bold;">
+                <button class="btn-success" onclick="claimCode()">NHẬN QUÀ</button>
+            </div>
+        </div>
+
+        <div id="tab-pvp" class="page-tab hidden">
+            <div class="room-box">
+                <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
+                <b id="my-peer-id" style="color: #00fff5; font-size: 14px; word-break: break-all;">Đang lấy mã...</b>
+            </div>
+
+            <p style="font-size: 12px; color: #00fff5; text-align: left; margin: 5px 0;">Nhập Mã ID Bạn Bè Để Đấu Online 2 Người:</p>
+            <input type="text" id="join-id-input" placeholder="Dán Mã ID đối thủ vào đây...">
+            <button class="btn-success" onclick="joinOnlineRoom()">⚔️ KẾT NỐI VÀO TRẬN ONLINE</button>
+            <p id="net-status" style="font-size: 11px; color: #f1c40f; margin-top: 8px;">Trạng thái: Chưa kết nối</p>
+        </div>
+
+    </div>
+
+    <script>
+        let currentAccount = null;
+        let userData = { money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [], bestTime: 0 };
+
+        const catVideo = document.getElementById('catSkillVideo');
+        const bgMusic = document.getElementById('bgMusic');
+        const processCanvas = document.createElement('canvas');
+        const processCtx = processCanvas.getContext('2d');
+
+        // BẮT SỰ KIỆN BÀN PHÍM
+        window.addEventListener('keydown', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+
+            const key = e.key || e.code;
+
+            if (['ArrowUp', 'KeyW', 'w', 'W'].includes(key)) { startMove('up'); e.preventDefault(); }
+            if (['ArrowDown', 'KeyS', 's', 'S'].includes(key)) { startMove('down'); e.preventDefault(); }
+            if (['ArrowLeft', 'KeyA', 'a', 'A'].includes(key)) { startMove('left'); e.preventDefault(); }
+            if (['ArrowRight', 'KeyD', 'd', 'D'].includes(key)) { startMove('right'); e.preventDefault(); }
+
+            if (['1', 'Digit1', 'Numpad1', 'KeyQ', 'q', 'Q', ' '].includes(key)) { useActiveSkill(); e.preventDefault(); }
+            if (['2', 'Digit2', 'Numpad2', 'KeyE', 'e', 'E'].includes(key)) { useSkill2(); e.preventDefault(); }
+            if (['Enter', 'NumpadEnter', 'Select'].includes(key)) { if (!isGamePlaying) startGameSession(); }
+            if (['Escape'].includes(key)) { if (isGamePlaying) stopGameSession('SẢNH CHỜ'); }
+        });
+
+        window.addEventListener('keyup', (e) => {
+            if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
+            const key = e.key || e.code;
+            if (['ArrowUp', 'KeyW', 'w', 'W'].includes(key)) stopMove('up');
+            if (['ArrowDown', 'KeyS', 's', 'S'].includes(key)) stopMove('down');
+            if (['ArrowLeft', 'KeyA', 'a', 'A'].includes(key)) stopMove('left');
+            if (['ArrowRight', 'KeyD', 'd', 'D'].includes(key)) stopMove('right');
+        });
+
+        // GHI NHỚ ĐĂNG NHẬP
+        window.onload = function() {
+            let savedAccount = localStorage.getItem('last_logged_user');
+            if(savedAccount) {
+                let data = localStorage.getItem('acc_' + savedAccount);
+                if(data) {
+                    currentAccount = savedAccount;
+                    userData = JSON.parse(data);
+                    if(!userData.claimedCodes) userData.claimedCodes = [];
+                    if(!userData.bestTime) userData.bestTime = 0;
+                    document.getElementById('auth-panel').classList.add('hidden');
+                    document.getElementById('game-panel').classList.remove('hidden');
+                    document.getElementById('user-display').innerText = savedAccount;
+                    updateUI();
+                    initGameEngine();
+                    initPeerJS();
+                }
+            }
+        };
+
+        function handleAuth(type) {
+            let u = document.getElementById('username').value.trim();
+            let p = document.getElementById('password').value.trim();
+            let st = document.getElementById('status');
+            if(!u || !p) return st.innerText = "Chưa nhập thông tin!";
+
+            if(type === 'register') {
+                if(localStorage.getItem('acc_' + u)) return st.innerText = "Tài khoản đã tồn tại!";
+                let newData = { pass: p, money: 0, inventory: ['human'], equipped: 'human', claimedCodes: [], bestTime: 0 };
+                localStorage.setItem('acc_' + u, JSON.stringify(newData));
+                st.style.color = '#2ed573'; st.innerText = "Đăng ký thành công!";
+            } else {
+                let data = localStorage.getItem('acc_' + u);
+                if(!data) return st.innerText = "Tài khoản không tồn tại!";
+                let parsed = JSON.parse(data);
+                if(parsed.pass !== p) return st.innerText = "Sai mật khẩu!";
+                
+                currentAccount = u;
+                userData = parsed;
+                if(!userData.claimedCodes) userData.claimedCodes = [];
+                if(!userData.bestTime) userData.bestTime = 0;
+                localStorage.setItem('last_logged_user', u);
+
+                document.getElementById('auth-panel').classList.add('hidden');
+                document.getElementById('game-panel').classList.remove('hidden');
+                document.getElementById('user-display').innerText = u;
+                updateUI();
+                initGameEngine();
+                initPeerJS();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('last_logged_user');
+            location.reload();
+        }
+
+        function saveData() {
+            if(currentAccount) localStorage.setItem('acc_' + currentAccount, JSON.stringify(userData));
+        }
+
+        function updateUI() {
+            document.getElementById('money-display').innerText = userData.money;
+            document.getElementById('best-time-display').innerText = userData.bestTime + 's';
+            updateShopUI();
+            updateBaloUI();
+            updateSkillButton();
+            updateLeaderboardUI();
+        }
+
+        function switchPage(page) {
+            document.querySelectorAll('.page-tab').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + page).classList.remove('hidden');
+            if (event && event.target) event.target.classList.add('active');
+            
+            if(page !== 'play') stopGameSession('SẢNH CHỜ');
+        }
+
+        // BẢNG XẾP HẠNG
+        function updateLeaderboardUI() {
+            let tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = "";
+            let users = [];
+
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith('acc_')) {
+                    let uName = key.replace('acc_', '');
+                    let data = JSON.parse(localStorage.getItem(key));
+                    users.push({ name: uName, bestTime: data.bestTime || 0 });
+                }
+            }
+
+            users.sort((a, b) => b.bestTime - a.bestTime);
+
+            users.forEach((u, index) => {
+                let rankBadge = index === 0 ? "🥇 1" : (index === 1 ? "🥈 2" : (index === 2 ? "🥉 3" : (index + 1)));
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:#00fff5;">${rankBadge}</td>
+                        <td>${u.name}</td>
+                        <td style="color:#f1c40f; font-weight:bold;">${u.bestTime}s</td>
+                    </tr>`;
+            });
+        }
+
+        function buyItem(item, price) {
+            if(userData.inventory.includes(item)) return alert("Bạn đã có nhân vật này!");
+            if(userData.money < price) return alert("Không đủ xu!");
+            
+            userData.money -= price;
+            userData.inventory.push(item);
+            saveData();
+            updateUI();
+            alert("Mua thành công!");
+        }
+
+        function updateShopUI() {
+            let bGhost = document.getElementById('buy-ghost-btn');
+            let bAlien = document.getElementById('buy-alien-btn');
+            let bCat = document.getElementById('buy-cat-btn');
+            let bWitch = document.getElementById('buy-witch-btn');
+            let bMusic = document.getElementById('buy-music-btn');
+            
+            if(userData.inventory.includes('ghost')) { bGhost.innerText = "Đã Có"; bGhost.disabled = true; }
+            if(userData.inventory.includes('alien')) { bAlien.innerText = "Đã Có"; bAlien.disabled = true; }
+            if(userData.inventory.includes('cat')) { bCat.innerText = "Đã Có"; bCat.disabled = true; }
+            if(userData.inventory.includes('witch')) { bWitch.innerText = "Đã Có"; bWitch.disabled = true; }
+            if(userData.inventory.includes('music')) { bMusic.innerText = "Đã Có"; bMusic.disabled = true; }
+        }
+
+        function updateBaloUI() {
+            let list = document.getElementById('inventory-list');
+            list.innerHTML = "";
+            const names = { 
+                human: "🧍 Người Bình Thường", 
+                ghost: "👻 Con Ma (Bất Tử)", 
+                alien: "👾 Alien (Vòng Năng Lượng)", 
+                cat: "🐱 Mèo (Hoạt Ảnh Vừa Vặn Quái)",
+                witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)",
+                music: "🎶 Âm Nhạc (Dịch Chuyển + Nhạc)",
+                twotime: "👼 Two-Time (Nghi Lễ Hồi Sinh + Tàng Hình)"
+            };
+
+            userData.inventory.forEach(item => {
+                let isEquipped = userData.equipped === item;
+                list.innerHTML += `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <div class="item-title">${names[item]}</div>
+                            <div class="item-desc">${isEquipped ? '🟢 Đang Trang Bị' : '⚪ Trong Balo'}</div>
+                        </div>
+                        <button class="${isEquipped ? 'btn-success' : 'btn-primary'}" style="width: 90px;" ${isEquipped ? 'disabled' : ''} onclick="equipItem('${item}')">
+                            ${isEquipped ? 'ĐANG DÙNG' : 'TRANG BỊ'}
+                        </button>
+                    </div>`;
+            });
+        }
+
+        function equipItem(item) {
+            userData.equipped = item;
+            resetSkillCooldowns();
+            saveData();
+            updateUI();
+        }
+
+        function claimCode() {
+            let code = document.getElementById('giftcode-input').value.trim();
+            if(code === "12345") {
+                if(userData.claimedCodes.includes("12345")) {
+                    alert("Bạn đã nhập mã quà tặng này rồi!");
+                } else {
+                    userData.money += 132;
+                    userData.claimedCodes.push("12345");
+                    saveData();
+                    updateUI();
+                    alert("🎉 Nhập mã thành công! Bạn nhận được +132 Coin!");
+                    document.getElementById('giftcode-input').value = "";
+                }
+            } else if(code === "twotime") {
+                if(userData.inventory.includes("twotime")) {
+                    alert("Bạn đã sở hữu nhân vật Two-Time rồi!");
+                } else {
+                    userData.inventory.push("twotime");
+                    userData.claimedCodes.push("twotime");
+                    saveData();
+                    updateUI();
+                    alert("🎉 Mở khóa thành công nhân vật Độc Quyền: TWO-TIME!");
+                    document.getElementById('giftcode-input').value = "";
+                }
+            } else {
+                alert("Mã quà tặng không đúng!");
+            }
+        }
+
+        // SKILL & COOLDOWN
+        let skillCD = false, skill2CD = false;
+        let cdTimer1 = null, cdTimer2 = null;
+
+        // BIẾN CHO NHÂN VẬT TWO-TIME
+        let twoTimeRitualUsed = false;
+        let twoTimeLives = 1;
+        let twoTimeStealth = false;
+        let twoTimeSkin = 'skin1';
+        let ritualCircle = { active: false, x: 0, y: 0, radius: 14 };
+
+        function resetSkillCooldowns() {
+            skillCD = false; skill2CD = false;
+            if (cdTimer1) clearInterval(cdTimer1);
+            if (cdTimer2) clearInterval(cdTimer2);
+            cdTimer1 = null; cdTimer2 = null;
+            updateSkillButton();
+        }
+
+        function updateSkillButton() {
+            let btn = document.getElementById('skillBtn');
+            let btn2 = document.getElementById('skill2Btn');
+
+            if(!isGamePlaying) { 
+                btn.innerText = "🔒 Bấm Play Để Dùng"; btn.disabled = true; 
+                btn2.classList.add('hidden');
+                return; 
+            }
+
+            btn2.classList.add('hidden');
+
+            if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
+            else if(userData.equipped === 'ghost') { btn.innerText = skillCD ? btn.innerText : "👻 Skill 1: Bất Tử (15s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'alien') { btn.innerText = skillCD ? btn.innerText : "👾 Skill 1: Vòng Tròn (36s)"; btn.disabled = skillCD; } 
+            else if(userData.equipped === 'cat') { btn.innerText = skillCD ? btn.innerText : "🐱 Skill 1: Trảm Cào (8s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'witch') { btn.innerText = skillCD ? btn.innerText : "🪼 Skill 1: Đẩy NPC (6s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'twotime') {
+                if(twoTimeRitualUsed) {
+                    btn.innerText = "🔒 Đã Đặt Nghi Lễ"; btn.disabled = true;
+                } else {
+                    btn.innerText = skillCD ? btn.innerText : "🕯️ Skill 1: Đặt Nghi Lễ"; btn.disabled = skillCD;
+                }
+                btn2.classList.remove('hidden');
+                btn2.innerText = skill2CD ? btn2.innerText : "👻 Skill 2: Tàng Hình (12s)"; btn2.disabled = skill2CD;
+            }
+            else if(userData.equipped === 'music') {
+                btn.innerText = skillCD ? btn.innerText : "✨ Skill 1: Dịch Chuyển (23s)"; btn.disabled = skillCD;
+                btn2.classList.remove('hidden');
+                btn2.innerText = skill2CD ? btn2.innerText : "🎵 Skill 2: Phát Nhạc (300s)"; btn2.disabled = skill2CD;
+            }
+        }
+
+        function useActiveSkill() {
+            if(skillCD || !isGamePlaying) return;
+
+            if(userData.equipped === 'ghost') {
+                ghostInvincible.active = true;
+                setTimeout(() => { ghostInvincible.active = false; }, 5000);
+                startCooldown(15, 'skillBtn');
+            } else if(userData.equipped === 'alien') {
+                alienShield.active = true;
+                setTimeout(() => { alienShield.active = false; }, 20000);
+                startCooldown(36, 'skillBtn');
+            } else if(userData.equipped === 'cat') {
+                let closestNpcIndex = -1;
+                let minDist = Infinity;
+
+                npcs.forEach((npc, index) => {
+                    let dx = player.x - npc.x, dy = player.y - npc.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < minDist) { minDist = dist; closestNpcIndex = index; }
+                });
+
+                if (closestNpcIndex !== -1) {
+                    let npc = npcs[closestNpcIndex];
+                    slashEffects.push({ x: npc.x, y: npc.y, frame: 0, maxFrame: 30 });
+                    npcs.splice(closestNpcIndex, 1);
+                } else {
+                    slashEffects.push({ x: player.x, y: player.y, frame: 0, maxFrame: 30 });
+                }
+
+                catVideo.currentTime = 0;
+                catVideo.play().catch(e => console.log(e));
+                startCooldown(8, 'skillBtn');
+            } else if(userData.equipped === 'witch') {
+                npcs.forEach(npc => {
+                    let dx = npc.x - player.x, dy = npc.y - player.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if(dist === 0) dist = 1;
+                    npc.x += (dx / dist) * 120; npc.y += (dy / dist) * 120;
+                    npc.x = Math.max(10, Math.min(canvas.width - 10, npc.x));
+                    npc.y = Math.max(10, Math.min(canvas.height - 10, npc.y));
+                });
+                startCooldown(6, 'skillBtn');
+            } else if(userData.equipped === 'twotime') {
+                if(twoTimeRitualUsed) return;
+                
+                twoTimeRitualUsed = true;
+                twoTimeLives = 2;
+                ritualCircle = { active: true, x: player.x, y: player.y, radius: 14 };
+
+                updateSkillButton();
+            } else if(userData.equipped === 'music') {
+                if (npcs.length > 0) {
+                    let maxAvgDist = -1, bestX = player.x, bestY = player.y;
+                    let testPoints = [{x: 20, y: 20}, {x: canvas.width - 20, y: 20}, {x: 20, y: canvas.height - 20}, {x: canvas.width - 20, y: canvas.height - 20}];
+
+                    testPoints.forEach(p => {
+                        let minDistToNpc = Infinity;
+                        npcs.forEach(npc => {
+                            let d = Math.sqrt((p.x - npc.x)**2 + (p.y - npc.y)**2);
+                            if (d < minDistToNpc) minDistToNpc = d;
+                        });
+                        if (minDistToNpc > maxAvgDist) { maxAvgDist = minDistToNpc; bestX = p.x; bestY = p.y; }
+                    });
+                    player.x = bestX; player.y = bestY;
+                }
+                startCooldown(23, 'skillBtn');
+            }
+        }
+
+        function useSkill2() {
+            if(skill2CD || !isGamePlaying) return;
+
+            if(userData.equipped === 'music') {
+                bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
+                startCooldown(300, 'skill2Btn');
+            } else if(userData.equipped === 'twotime') {
+                twoTimeStealth = true;
+                setTimeout(() => { twoTimeStealth = false; }, 3000);
+                startCooldown(12, 'skill2Btn');
+            }
+        }
+
+        function startCooldown(seconds, btnId) {
+            let isSkill1 = btnId === 'skillBtn';
+            let btn = document.getElementById(btnId);
+            let timer = seconds;
+            btn.disabled = true;
+
+            if (isSkill1) {
+                skillCD = true;
+                if (cdTimer1) clearInterval(cdTimer1);
+                cdTimer1 = setInterval(() => {
+                    timer--;
+                    if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
+                    else { 
+                        clearInterval(cdTimer1); cdTimer1 = null; skillCD = false; 
+                        updateSkillButton(); 
+                    }
+                }, 1000);
+            } else {
+                skill2CD = true;
+                if (cdTimer2) clearInterval(cdTimer2);
+                cdTimer2 = setInterval(() => {
+                    timer--;
+                    if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
+                    else { 
+                        clearInterval(cdTimer2); cdTimer2 = null; skill2CD = false; 
+                        updateSkillButton(); 
+                    }
+                }, 1000);
+            }
+        }
+
+        // BỘ ĐẾM THỜI GIAN SỐNG SÓT
+        let survivalSeconds = 0;
+        let survivalTimer = null;
+
+        function startSurvivalTimer() {
+            survivalSeconds = 0;
+            updateTimerDisplay();
+            if (survivalTimer) clearInterval(survivalTimer);
+            survivalTimer = setInterval(() => {
+                survivalSeconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+
+        function stopSurvivalTimer() {
+            if (survivalTimer) clearInterval(survivalTimer);
+            survivalTimer = null;
+            if (survivalSeconds > userData.bestTime) {
+                userData.bestTime = survivalSeconds;
+                saveData();
+                updateUI();
+            }
+        }
+
+        function updateTimerDisplay() {
+            let mins = Math.floor(survivalSeconds / 60).toString().padStart(2, '0');
+            let secs = (survivalSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('gameTimer').innerText = `${mins}:${secs}`;
+        }
+
+        // GAME ENGINE & MULTIPLAYER
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let moveState = { up: false, down: false, left: false, right: false };
+        
+        let player = { x: 180, y: 105, radius: 10, speed: 2.2 };
+        let remotePlayer = { x: -100, y: -100, active: false, equipped: 'human', skin: 'skin1' };
+
+        let alienShield = { active: false, radius: 45 };
+        let ghostInvincible = { active: false };
+        let slashEffects = [], npcs = [], droppedCoins = [];
+        let isGamePlaying = false, coinSpawnTimer = null;
+
+        let peer = null, conn = null;
+
+        function initPeerJS() {
+            peer = new Peer();
+            peer.on('open', (id) => { document.getElementById('my-peer-id').innerText = id; });
+            peer.on('connection', (connection) => {
+                conn = connection;
+                setupNetworkEvents();
+                document.getElementById('net-status').innerText = "🟢 Đã kết nối với Đối thủ!";
+                alert("🎉 Có người vừa kết nối đấu Online với bạn!");
+            });
+        }
+
+        function joinOnlineRoom() {
+            let targetId = document.getElementById('join-id-input').value.trim();
+            if(!targetId) return alert("Vui lòng nhập Mã ID!");
+
+            conn = peer.connect(targetId);
+            setupNetworkEvents();
+            document.getElementById('net-status').innerText = "🟢 Đã kết nối vào trận thành công!";
+            switchPage('play');
+            startGameSession();
+        }
+
+        function setupNetworkEvents() {
+            remotePlayer.active = true;
+            conn.on('data', (data) => {
+                if (data.type === 'move') {
+                    remotePlayer.x = data.x;
+                    remotePlayer.y = data.y;
+                    remotePlayer.equipped = data.equipped;
+                    remotePlayer.skin = data.skin || 'skin1';
+                } else if (data.type === 'chat') {
+                    appendChatMessage(data.sender, data.msg);
+                }
+            });
+        }
+
+        function startMove(d) { if(isGamePlaying) moveState[d] = true; }
+        function stopMove(d) { moveState[d] = false; }
+
+        function startGameSession() {
+            isGamePlaying = true;
+            player.x = 180; player.y = 105;
+            droppedCoins = []; slashEffects = [];
+            
+            twoTimeRitualUsed = false;
+            twoTimeLives = 1;
+            twoTimeStealth = false;
+            twoTimeSkin = 'skin1';
+            ritualCircle.active = false;
+
+            document.getElementById('menu-overlay').classList.add('hidden');
+            
+            resetSkillCooldowns();
+            startSurvivalTimer();
+
+            npcs = [];
+            let count = Math.floor(Math.random() * 3) + 2;
+            for(let i = 0; i < count; i++) {
+                npcs.push({ x: Math.random() * (canvas.width - 20) + 10, y: Math.random() * (canvas.height - 20) + 10, radius: 8, speed: 0.9 + Math.random() * 0.3 });
+            }
+            scheduleNextCoin();
+        }
+
+        function stopGameSession(titleText = 'SẢNH CHỜ', subText = '') {
+            isGamePlaying = false;
+            let overlay = document.getElementById('menu-overlay');
+            document.getElementById('overlay-title').innerText = titleText;
+            document.getElementById('overlay-sub').innerText = subText ? subText : `Thời gian sống sót: ${survivalSeconds}s`;
+            overlay.classList.remove('hidden');
+            
+            clearTimeout(coinSpawnTimer);
+            bgMusic.pause();
+            
+            stopSurvivalTimer();
+            resetSkillCooldowns();
+        }
+
+        function scheduleNextCoin() {
+            if(!isGamePlaying) return;
+            let time = (Math.floor(Math.random() * 4) + 3) * 1000;
+            coinSpawnTimer = setTimeout(() => {
+                if(isGamePlaying) {
+                    droppedCoins.push({ x: Math.random() * (canvas.width - 40) + 20, y: Math.random() * (canvas.height - 40) + 20, value: Math.floor(Math.random() * 26) + 1 });
+                    scheduleNextCoin();
+                }
+            }, time);
+        }
+
+        function updateGame() {
+            if(!isGamePlaying) return;
+            let moved = false;
+
+            if (moveState.up && player.y - player.radius > 0) { player.y -= player.speed; moved = true; }
+            if (moveState.down && player.y + player.radius < canvas.height) { player.y += player.speed; moved = true; }
+            if (moveState.left && player.x - player.radius > 0) { player.x -= player.speed; moved = true; }
+            if (moveState.right && player.x + player.radius < canvas.width) { player.x += player.speed; moved = true; }
+
+            if(moved && conn && conn.open) {
+                conn.send({ type: 'move', x: player.x, y: player.y, equipped: userData.equipped, skin: twoTimeSkin });
+            }
+
+            // Ăn Xu
+            droppedCoins = droppedCoins.filter(coin => {
+                let dx = player.x - coin.x, dy = player.y - coin.y;
+                if(Math.sqrt(dx * dx + dy * dy) < player.radius + 10) {
+                    userData.money += coin.value; saveData(); updateUI(); return false;
+                }
+                return true;
+            });
+
+            // NPC di chuyển
+            npcs.forEach(npc => {
+                if(userData.equipped === 'twotime' && twoTimeStealth) return; 
+
+                let target = player;
+                let minDist = Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2);
+
+                if(remotePlayer.active) {
+                    let d = Math.sqrt((remotePlayer.x - npc.x)**2 + (remotePlayer.y - npc.y)**2);
+                    if(d < minDist) { minDist = d; target = remotePlayer; }
+                }
+
+                let dx = target.x - npc.x, dy = target.y - npc.y;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (alienShield.active && userData.equipped === 'alien') {
+                    if (dist < alienShield.radius + npc.radius) {
+                        let angle = Math.atan2(dy, dx);
+                        npc.x = target.x - Math.cos(angle) * (alienShield.radius + npc.radius);
+                        npc.y = target.y - Math.sin(angle) * (alienShield.radius + npc.radius);
+                        return;
+                    }
+                }
+
+                if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
+
+                // Va chạm NPC
+                if (Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2) < player.radius + npc.radius) {
+                    if (ghostInvincible.active && userData.equipped === 'ghost') return;
+
+                    // HỒI SINH VỀ NGHI LỄ
+                    if (userData.equipped === 'twotime' && twoTimeLives > 1 && ritualCircle.active) {
+                        twoTimeLives = 1;
+                        twoTimeSkin = 'skin2';
+                        
+                        player.x = ritualCircle.x;
+                        player.y = ritualCircle.y;
+
+                        ritualCircle.active = false;
+
+                        npcs.forEach(n => {
+                            let pushAngle = Math.atan2(n.y - player.y, n.x - player.x);
+                            n.x += Math.cos(pushAngle) * 80;
+                            n.y += Math.sin(pushAngle) * 80;
+                        });
+                        return;
+                    }
+
+                    stopGameSession('💀 BẠN ĐÃ CHẾT!');
+                }
+            });
+        }
+
+        function drawSlashEffects() {
+            if (catVideo.videoWidth > 0) {
+                processCanvas.width = catVideo.videoWidth;
+                processCanvas.height = catVideo.videoHeight;
+                processCtx.drawImage(catVideo, 0, 0);
+                let imgData = processCtx.getImageData(0, 0, processCanvas.width, processCanvas.height);
+                let data = imgData.data;
+
+                for (let i = 0; i < data.length; i += 4) {
+                    if (data[i] > 200 && data[i+1] > 200 && data[i+2] > 200) data[i + 3] = 0;
+                }
+                processCtx.putImageData(imgData, 0, 0);
+            }
+
+            slashEffects.forEach((eff) => {
+                ctx.save();
+                const npcSize = 24; 
+                ctx.drawImage(processCanvas, eff.x - npcSize/2, eff.y - npcSize/2, npcSize, npcSize);
+                ctx.restore();
+                eff.frame++;
+            });
+
+            slashEffects = slashEffects.filter(eff => eff.frame < eff.maxFrame);
+        }
+
+        function drawTwoTimeAvatar(x, y, skin) {
+            ctx.save();
+            
+            if (skin === 'skin2') {
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+
+                ctx.beginPath();
+                ctx.moveTo(x - 6, y);
+                ctx.quadraticCurveTo(x - 22, y - 12, x - 18, y + 6);
+                ctx.quadraticCurveTo(x - 10, y + 2, x - 6, y);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(x + 6, y);
+                ctx.quadraticCurveTo(x + 22, y - 12, x + 18, y + 6);
+                ctx.quadraticCurveTo(x + 10, y + 2, x + 6, y);
+                ctx.fill(); ctx.stroke();
+            }
+
+            ctx.beginPath();
+            ctx.arc(x, y, 9, 0, Math.PI * 2);
+            ctx.fillStyle = '#4a4a4a';
+            ctx.fill();
+            ctx.strokeStyle = '#222';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.ellipse(x, y - 11, 9, 3, 0, 0, Math.PI * 2);
+            ctx.strokeStyle = '#dcdde1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Vẽ Xu
+            droppedCoins.forEach(coin => {
+                ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(coin.x, coin.y, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
+            });
+
+            // Vẽ Tế Đàn Nghi Lễ
+            if (ritualCircle.active) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(ritualCircle.x, ritualCircle.y, ritualCircle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]);
+                ctx.stroke();
+                
+                ctx.font = '10px Arial';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.fillText('🕯️', ritualCircle.x, ritualCircle.y + 3);
+                ctx.restore();
+            }
+
+            // Shield Alien
+            if (alienShield.active && userData.equipped === 'alien') {
+                ctx.beginPath(); ctx.arc(player.x, player.y, alienShield.radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(0, 255, 204, 0.25)'; ctx.fill(); ctx.strokeStyle = '#00ffcc'; ctx.stroke();
+            }
+
+            drawSlashEffects();
+
+            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼', music: '🎶' };
+
+            // Vẽ Player
+            ctx.save();
+            if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
+            if (userData.equipped === 'twotime' && twoTimeStealth) ctx.globalAlpha = 0.3;
+
+            if (userData.equipped === 'twotime') {
+                drawTwoTimeAvatar(player.x, player.y, twoTimeSkin);
+            } else {
+                ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(icons[userData.equipped] || '🧍', player.x, player.y);
+            }
+            ctx.restore();
+
+            // Vẽ P2 Online
+            if(remotePlayer.active) {
+                if (remotePlayer.equipped === 'twotime') {
+                    drawTwoTimeAvatar(remotePlayer.x, remotePlayer.y, remotePlayer.skin);
+                } else {
+                    ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText(icons[remotePlayer.equipped] || '🧍', remotePlayer.x, remotePlayer.y);
+                }
+                ctx.font = '9px Arial'; ctx.fillStyle = '#e94560'; ctx.textAlign = 'center';
+                ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
+            }
+
+            // Vẽ NPC
+            npcs.forEach(npc => {
+                ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
+            });
+        }
+
+        let isEngineRunning = false;
+        function gameLoop() { updateGame(); drawGame(); requestAnimationFrame(gameLoop); }
+        function initGameEngine() { if (!isEngineRunning) { isEngineRunning = true; gameLoop(); } }
+
+        // TÍNH NĂNG CHAT REAL-TIME
+        function sendChat() {
+            let inp = document.getElementById('chat-input');
+            let msg = inp.value.trim();
+            if(!msg) return;
+
+            appendChatMessage(currentAccount, msg);
+
+            if (conn && conn.open) {
+                conn.send({ type: 'chat', sender: currentAccount, msg: msg });
+            }
+
+            inp.value = "";
+        }
+
+        function appendChatMessage(sender, msg) {
+            let box = document.getElementById('in-game-chat');
+            box.innerHTML += `<div class="chat-msg"><span class="chat-user">${sender}:</span> ${msg}</div>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+</body>
 </html>
