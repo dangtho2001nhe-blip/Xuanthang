@@ -9,9 +9,38 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
         body { background: #0a0a16; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 10px; }
         
+        /* CARD DÙNG CHUNG */
         .card { 
             background: rgba(22, 33, 62, 0.95); padding: 15px; border-radius: 20px; width: 100%; max-width: 420px; text-align: center; 
             box-shadow: 0 0 20px rgba(0, 255, 245, 0.2); border: 1px solid rgba(0, 255, 245, 0.3); position: relative;
+        }
+
+        /* KHU VỰC ĐĂNG NHẬP CÓ HÌNH NỀN */
+        #auth-panel {
+            background-image: url('image.png'); /* Sử dụng tệp ảnh nền */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        /* Lớp phủ mờ giúp chữ và form nổi bật dễ đọc */
+        #auth-panel::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(10, 10, 22, 0.65);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1;
+        }
+
+        #auth-panel * {
+            position: relative;
+            z-index: 2;
         }
 
         h2 { color: #00fff5; margin: 0 0 10px 0; font-size: 20px; text-transform: uppercase; text-shadow: 0 0 8px rgba(0,255,245,0.6); }
@@ -24,7 +53,7 @@
         /* General Inputs & Buttons */
         .input-group { margin-bottom: 10px; text-align: left; }
         .input-group label { display: block; font-size: 11px; color: #a29bfe; margin-bottom: 4px; }
-        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: #0f172a; color: #fff; outline: none; }
+        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #1f4068; background: rgba(15, 23, 42, 0.85); color: #fff; outline: none; }
         
         button { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: none; font-weight: bold; font-size: 13px; cursor: pointer; transition: 0.2s; }
         button:active, button:focus { transform: scale(0.98); outline: 2px solid #00fff5; }
@@ -102,7 +131,7 @@
         </div>
         <button class="btn-primary" onclick="handleAuth('login')">ĐĂNG NHẬP</button>
         <button class="btn-success" onclick="handleAuth('register')">ĐĂNG KÝ</button>
-        <p id="status" style="font-size: 12px; color: #ff4757;"></p>
+        <p id="status" style="font-size: 12px; color: #ff4757; margin-top: 8px; font-weight: bold;"></p>
     </div>
 
     <div id="game-panel" class="card hidden">
@@ -415,7 +444,7 @@
             let list = document.getElementById('inventory-list');
             list.innerHTML = "";
             const names = { 
-                human: "🧍 Người Bình Thường", 
+                human: "⭕️ Người Bình Thường", 
                 ghost: "👻 Con Ma (Bất Tử)", 
                 alien: "👾 Alien (Vòng Năng Lượng)", 
                 cat: "🐱 Mèo (Hoạt Ảnh Vừa Vặn Quái)",
@@ -539,7 +568,6 @@
                 setTimeout(() => { alienShield.active = false; }, 20000);
                 startCooldown(36, 'skillBtn');
             } else if(userData.equipped === 'cat') {
-                // TIÊU DIỆT 1 NPC GẦN NHẤT
                 let closestNpcIndex = -1;
                 let minDist = Infinity;
 
@@ -551,7 +579,6 @@
 
                 if (closestNpcIndex !== -1) {
                     let npc = npcs[closestNpcIndex];
-                    // Tạo hiệu ứng trảm đúng vị trí NPC bị tiêu diệt
                     slashEffects.push({ x: npc.x, y: npc.y, frame: 0, maxFrame: 30 });
                     npcs.splice(closestNpcIndex, 1);
                 } else {
@@ -731,7 +758,6 @@
             player.x = 180; player.y = 105;
             droppedCoins = []; slashEffects = [];
             
-            // Reset trạng thái Two-Time khi vào trận
             twoTimeRitualUsed = false;
             twoTimeLives = 1;
             twoTimeStealth = false;
@@ -831,7 +857,7 @@
                     // HỒI SINH VỀ NGHI LỄ
                     if (userData.equipped === 'twotime' && twoTimeLives > 1 && ritualCircle.active) {
                         twoTimeLives = 1;
-                        twoTimeSkin = 'skin2'; // Sang dạng có Đôi Cánh
+                        twoTimeSkin = 'skin2';
                         
                         player.x = ritualCircle.x;
                         player.y = ritualCircle.y;
@@ -846,7 +872,7 @@
                         return;
                     }
 
-                    stopGameSession('💀 BẠN ĐÃ CHẾT!');
+                    stopGameSession('👀 CHƠI LẠI ĐUY🥲!');
                 }
             });
         }
@@ -867,7 +893,6 @@
 
             slashEffects.forEach((eff) => {
                 ctx.save();
-                // CHỈNH KÍCH THƯỚC VỪA BẰNG NPC QUÁI (24x24 pixel, khớp hoàn toàn với vị trí NPC)
                 const npcSize = 24; 
                 ctx.drawImage(processCanvas, eff.x - npcSize/2, eff.y - npcSize/2, npcSize, npcSize);
                 ctx.restore();
@@ -877,7 +902,6 @@
             slashEffects = slashEffects.filter(eff => eff.frame < eff.maxFrame);
         }
 
-        // VẼ TWO-TIME
         function drawTwoTimeAvatar(x, y, skin) {
             ctx.save();
             
@@ -886,14 +910,12 @@
                 ctx.lineWidth = 2.5;
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
 
-                // Cánh trái
                 ctx.beginPath();
                 ctx.moveTo(x - 6, y);
                 ctx.quadraticCurveTo(x - 22, y - 12, x - 18, y + 6);
                 ctx.quadraticCurveTo(x - 10, y + 2, x - 6, y);
                 ctx.fill(); ctx.stroke();
 
-                // Cánh phải
                 ctx.beginPath();
                 ctx.moveTo(x + 6, y);
                 ctx.quadraticCurveTo(x + 22, y - 12, x + 18, y + 6);
@@ -942,7 +964,7 @@
                 ctx.font = '10px Arial';
                 ctx.fillStyle = '#fff';
                 ctx.textAlign = 'center';
-                ctx.fillText('🫥', ritualCircle.x, ritualCircle.y + 3);
+                ctx.fillText('🚫', ritualCircle.x, ritualCircle.y + 3);
                 ctx.restore();
             }
 
@@ -954,7 +976,7 @@
 
             drawSlashEffects();
 
-            const icons = { human: '🧍', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼', music: '🎶' };
+            const icons = { human: '⭕️', ghost: '👻', alien: '👾', cat: '🐱', witch: '🪼', music: '🎶' };
 
             // Vẽ Player
             ctx.save();
@@ -981,7 +1003,7 @@
                 ctx.fillText("P2 Online", remotePlayer.x, remotePlayer.y - 16);
             }
 
-            // Vẽ NPC (Quái vật - Bán kính radius = 8px => Đường kính = 16px)
+            // Vẽ NPC
             npcs.forEach(npc => {
                 ctx.beginPath(); ctx.arc(npc.x, npc.y, npc.radius, 0, Math.PI * 2); ctx.fillStyle = '#ff4757'; ctx.fill();
             });
