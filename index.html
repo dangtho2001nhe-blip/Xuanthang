@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Cyber Game - Multi-Device, Leaderboard & Two-Time</title>
+    <title>Super Cyber Game - Multi-Device, Leaderboard & Two-Time Updated</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; user-select: none; -webkit-user-select: none; }
@@ -87,9 +87,11 @@
 </head>
 <body>
 
+    <!-- MEDIA ẨN -->
     <video id="catSkillVideo" src="Cat.MOV" playsinline muted style="display:none;"></video>
     <audio id="bgMusic" src="music.MOV" style="display:none;"></audio>
 
+    <!-- AUTH PANEL -->
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
         <div class="input-group">
@@ -105,6 +107,7 @@
         <p id="status" style="font-size: 12px; color: #ff4757;"></p>
     </div>
 
+    <!-- MAIN GAME PANEL -->
     <div id="game-panel" class="card hidden">
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
@@ -112,6 +115,7 @@
             <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
         </div>
         
+        <!-- NAV BAR -->
         <div class="nav-bar">
             <button class="nav-btn active" onclick="switchPage('play')">PLAY</button>
             <button class="nav-btn" onclick="switchPage('rank')">XẾP HẠNG</button>
@@ -121,10 +125,12 @@
             <button class="nav-btn" onclick="switchPage('pvp')">ONLINE</button>
         </div>
 
+        <!-- 1. PLAY TAB -->
         <div id="tab-play" class="page-tab">
             <div class="canvas-container">
                 <canvas id="gameCanvas" width="360" height="210"></canvas>
                 
+                <!-- BỘ ĐẾM THỜI GIAN SỐNG SÓT -->
                 <div class="timer-display">⏱️ <span id="gameTimer">00:00</span></div>
 
                 <div id="menu-overlay" class="game-overlay">
@@ -148,6 +154,7 @@
                 </div>
             </div>
 
+            <!-- CHAT TRỰC TIẾP TRONG GAME -->
             <div class="chat-box" id="in-game-chat">
                 <div class="chat-msg"><span class="chat-user">Hệ Thống:</span> Khung chat trực tiếp trong trận đấu.</div>
             </div>
@@ -159,6 +166,7 @@
             <div class="guide-text">🎮 TV/PC: Mũi tên (Di chuyển) | Phím 1 (Skill 1) | Phím 2 (Skill 2)</div>
         </div>
 
+        <!-- 2. BẢNG XẾP HẠNG TAB -->
         <div id="tab-rank" class="page-tab hidden">
             <h3 style="color: #00fff5; margin-top: 5px;">🏆 BẢNG XẾP HẠNG THỜI GIAN SỐNG SÓT</h3>
             <table class="lb-table">
@@ -173,6 +181,7 @@
             </table>
         </div>
 
+        <!-- 3. SHOP TAB -->
         <div id="tab-shop" class="page-tab hidden">
             <div class="item-card">
                 <div class="item-info">
@@ -190,8 +199,8 @@
             </div>
             <div class="item-card">
                 <div class="item-info">
-                    <div class="item-title">🐱 Mèo</div>
-                    <div class="item-desc">Skill: Vồ Chết 1 NPC Gần Nhất</div>
+                    <div class="item-title">🐱 Mèo (Đã Nâng Cấp)</div>
+                    <div class="item-desc">Skill: Cào Diện Rộng Diệt Toàn Bộ NPC Gần</div>
                 </div>
                 <button id="buy-cat-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('cat', 123)">123 Xu</button>
             </div>
@@ -212,16 +221,18 @@
             <div class="item-card" style="border: 1px solid #fdcb6e;">
                 <div class="item-info">
                     <div class="item-title" style="color:#fdcb6e;">👼 Two-Time (Độc Quyền)</div>
-                    <div class="item-desc">Chỉ mở khóa bằng Giftcode: twotime</div>
+                    <div class="item-desc">C1: Đặt Nghi Lễ Hồi Sinh Quay Lại<br>C2: Tàng Hình (Dùng Được Cả 2 Mạng)</div>
                 </div>
                 <button class="btn-danger" style="width: 90px; font-size:11px;" disabled>GIFTCODE</button>
             </div>
         </div>
 
+        <!-- 4. BALO TAB -->
         <div id="tab-balo" class="page-tab hidden">
             <div id="inventory-list"></div>
         </div>
 
+        <!-- 5. GIFTCODE TAB -->
         <div id="tab-code" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 12px; color: #00fff5; margin-bottom: 8px;">NHẬP MÃ QUÀ TẶNG GIFTCODE</p>
@@ -230,6 +241,7 @@
             </div>
         </div>
 
+        <!-- 6. ONLINE MULTIPLAYER TAB -->
         <div id="tab-pvp" class="page-tab hidden">
             <div class="room-box">
                 <p style="font-size: 11px; margin: 0 0 3px 0; color: #aaa;">Mã ID Online Của Bạn:</p>
@@ -418,10 +430,10 @@
                 human: "🧍 Người Bình Thường", 
                 ghost: "👻 Con Ma (Bất Tử)", 
                 alien: "👾 Alien (Vòng Năng Lượng)", 
-                cat: "🐱 Mèo (Trảm 1 NPC Gần)",
+                cat: "🐱 Mèo (Trảm Toàn Bộ NPC Gần)",
                 witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)",
                 music: "🎶 Âm Nhạc (Dịch Chuyển + Nhạc)",
-                twotime: "👼 Two-Time (Nghi Lễ 2 Mạng + Tàng Hình)"
+                twotime: "👼 Two-Time (Nghi Lễ Hồi Sinh + Tàng Hình)"
             };
 
             userData.inventory.forEach(item => {
@@ -480,10 +492,10 @@
         let cdTimer1 = null, cdTimer2 = null;
 
         // BIẾN CHO NHÂN VẬT TWO-TIME
-        let twoTimeRitualUsed = false; // Chỉ xài 1 lần / trận
-        let twoTimeLives = 1;          // Ban đầu 1 mạng, dùng skill -> 2 mạng
-        let twoTimeStealth = false;    // Tàng hình trong 2s
-        let twoTimeSkin = 'skin1';     // 'skin1' hoặc 'skin2' (khi chết biến hình)
+        let twoTimeRitualUsed = false; // Nghi lễ chỉ dùng 1 lần / trận
+        let twoTimeLives = 1;          // Ban đầu 1 mạng, dùng skill 1 -> 2 mạng
+        let twoTimeStealth = false;    // Tàng hình
+        let twoTimeSkin = 'skin1';     // 'skin1' hoặc 'skin2' (cuộc sống 2)
         let ritualCircle = { active: false, x: 0, y: 0, radius: 14 };
 
         function resetSkillCooldowns() {
@@ -509,14 +521,17 @@
             if(userData.equipped === 'human') { btn.innerText = "🔒 Không Có Skill"; btn.disabled = true; } 
             else if(userData.equipped === 'ghost') { btn.innerText = skillCD ? btn.innerText : "👻 Skill 1: Bất Tử (15s)"; btn.disabled = skillCD; } 
             else if(userData.equipped === 'alien') { btn.innerText = skillCD ? btn.innerText : "👾 Skill 1: Vòng Tròn (36s)"; btn.disabled = skillCD; } 
-            else if(userData.equipped === 'cat') { btn.innerText = skillCD ? btn.innerText : "🐱 Skill 1: Trảm NPC (8s)"; btn.disabled = skillCD; }
+            else if(userData.equipped === 'cat') { btn.innerText = skillCD ? btn.innerText : "🐱 Skill 1: Trảm Toàn Bộ (8s)"; btn.disabled = skillCD; }
             else if(userData.equipped === 'witch') { btn.innerText = skillCD ? btn.innerText : "🪼 Skill 1: Đẩy NPC (6s)"; btn.disabled = skillCD; }
             else if(userData.equipped === 'twotime') {
+                // TWO-TIME DÙNG 2 SKILL TÁCH BIỆT
                 if(twoTimeRitualUsed) {
-                    btn.innerText = "🔒 Đã Dùng Nghi Lễ (1 Lần/Trận)"; btn.disabled = true;
+                    btn.innerText = "🔒 Đã Đặt Nghi Lễ"; btn.disabled = true;
                 } else {
-                    btn.innerText = skillCD ? btn.innerText : "👼 Skill 1: Nghi Lễ + Tàng Hình (10s)"; btn.disabled = skillCD;
+                    btn.innerText = skillCD ? btn.innerText : "🕯️ Skill 1: Đặt Nghi Lễ"; btn.disabled = skillCD;
                 }
+                btn2.classList.remove('hidden');
+                btn2.innerText = skill2CD ? btn2.innerText : "👻 Skill 2: Tàng Hình (12s)"; btn2.disabled = skill2CD;
             }
             else if(userData.equipped === 'music') {
                 btn.innerText = skillCD ? btn.innerText : "✨ Skill 1: Dịch Chuyển (23s)"; btn.disabled = skillCD;
@@ -537,23 +552,28 @@
                 setTimeout(() => { alienShield.active = false; }, 20000);
                 startCooldown(36, 'skillBtn');
             } else if(userData.equipped === 'cat') {
-                if (npcs.length === 0) return;
-                let closestIndex = -1, minDist = Infinity;
+                // CẢI TIẾN: Trảm tất cả NPC trong bán kính 80px
+                let range = 80;
+                let hitNpcs = false;
 
-                npcs.forEach((npc, index) => {
+                for (let i = npcs.length - 1; i >= 0; i--) {
+                    let npc = npcs[i];
                     let dx = player.x - npc.x, dy = player.y - npc.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < minDist) { minDist = dist; closestIndex = index; }
-                });
-
-                if (closestIndex !== -1) {
-                    let targetNpc = npcs[closestIndex];
-                    catVideo.currentTime = 0;
-                    catVideo.play().catch(e => console.log(e));
-                    slashEffects.push({ x: targetNpc.x, y: targetNpc.y, frame: 0, maxFrame: 45 });
-                    npcs.splice(closestIndex, 1);
-                    startCooldown(8, 'skillBtn');
+                    if (dist <= range) {
+                        slashEffects.push({ x: npc.x, y: npc.y, frame: 0, maxFrame: 45 });
+                        npcs.splice(i, 1);
+                        hitNpcs = true;
+                    }
                 }
+
+                if (!hitNpcs) {
+                    slashEffects.push({ x: player.x, y: player.y, frame: 0, maxFrame: 45 });
+                }
+
+                catVideo.currentTime = 0;
+                catVideo.play().catch(e => console.log(e));
+                startCooldown(8, 'skillBtn');
             } else if(userData.equipped === 'witch') {
                 npcs.forEach(npc => {
                     let dx = npc.x - player.x, dy = npc.y - player.y;
@@ -565,17 +585,14 @@
                 });
                 startCooldown(6, 'skillBtn');
             } else if(userData.equipped === 'twotime') {
+                // SKILL 1: ĐẶT NGHI LỄ
                 if(twoTimeRitualUsed) return;
                 
                 twoTimeRitualUsed = true;
-                twoTimeLives = 2; // Cho 2 mạng sống
-                twoTimeStealth = true; // Quái mất dấu trong 2s
-
-                // Đặt tế đàn màu trắng
+                twoTimeLives = 2; // Được trao thêm 1 mạng dự phòng
                 ritualCircle = { active: true, x: player.x, y: player.y, radius: 14 };
 
-                setTimeout(() => { twoTimeStealth = false; }, 2000);
-                startCooldown(10, 'skillBtn');
+                updateSkillButton();
             } else if(userData.equipped === 'music') {
                 if (npcs.length > 0) {
                     let maxAvgDist = -1, bestX = player.x, bestY = player.y;
@@ -596,9 +613,17 @@
         }
 
         function useSkill2() {
-            if(skill2CD || !isGamePlaying || userData.equipped !== 'music') return;
-            bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
-            startCooldown(300, 'skill2Btn');
+            if(skill2CD || !isGamePlaying) return;
+
+            if(userData.equipped === 'music') {
+                bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
+                startCooldown(300, 'skill2Btn');
+            } else if(userData.equipped === 'twotime') {
+                // SKILL 2: TÀNG HÌNH 3 GIÂY (DÙNG ĐƯỢC CẢ Ở CUỘC SỐNG 1 & CUỘC SỐNG 2)
+                twoTimeStealth = true;
+                setTimeout(() => { twoTimeStealth = false; }, 3000);
+                startCooldown(12, 'skill2Btn');
+            }
         }
 
         function startCooldown(seconds, btnId) {
@@ -624,7 +649,10 @@
                 cdTimer2 = setInterval(() => {
                     timer--;
                     if(timer > 0) btn.innerText = `Hồi (${timer}s)`;
-                    else { clearInterval(cdTimer2); cdTimer2 = null; skill2CD = false; updateSkillButton(); }
+                    else { 
+                        clearInterval(cdTimer2); cdTimer2 = null; skill2CD = false; 
+                        updateSkillButton(); 
+                    }
                 }, 1000);
             }
         }
@@ -787,9 +815,9 @@
 
             // NPC di chuyển
             npcs.forEach(npc => {
-                // Nếu Two-Time đang Tàng hình -> NPC không phát hiện người chơi
+                // Tàng hình -> NPC không phát hiện người chơi
                 if(userData.equipped === 'twotime' && twoTimeStealth) {
-                    return; // NPC đứng yên hoặc mất dấu
+                    return; 
                 }
 
                 let target = player;
@@ -814,20 +842,27 @@
 
                 if (dist > 0) { npc.x += (dx / dist) * npc.speed; npc.y += (dy / dist) * npc.speed; }
 
-                // Va chạm = Chết hoặc Hồi sinh
+                // Va chạm = Chết hoặc Hồi sinh về Nghi lễ
                 if (Math.sqrt((player.x - npc.x)**2 + (player.y - npc.y)**2) < player.radius + npc.radius) {
                     if (ghostInvincible.active && userData.equipped === 'ghost') return;
 
-                    // Xử lý Hồi Sinh của Two-Time
-                    if (userData.equipped === 'twotime' && twoTimeLives > 1) {
-                        twoTimeLives = 1;             // Mất 1 mạng
-                        twoTimeSkin = 'skin2';        // Đổi sang Skin 2 (Cánh thiên thần)
-                        ritualCircle.active = false;   // Tế đàn biến mất
+                    // XỬ LÝ QUAY LẠI NGHI LỄ & BẮT ĐẦU CUỘC SỐNG 2 CỦA TWO-TIME
+                    if (userData.equipped === 'twotime' && twoTimeLives > 1 && ritualCircle.active) {
+                        twoTimeLives = 1;              // Trở về 1 mạng
+                        twoTimeSkin = 'skin2';         // Đổi dạng sang Skin 2 (Có đôi cánh)
                         
-                        // Đẩy nhẹ NPC ra xa để tránh dính chết liên tiếp
-                        let pushAngle = Math.atan2(npc.y - player.y, npc.x - player.x);
-                        npc.x += Math.cos(pushAngle) * 60;
-                        npc.y += Math.sin(pushAngle) * 60;
+                        // Dịch chuyển người chơi DỊCH CHUYỂN QUAY LẠI VỊ TRÍ NGHI LỄ
+                        player.x = ritualCircle.x;
+                        player.y = ritualCircle.y;
+
+                        ritualCircle.active = false;   // Tế đàn Nghi lễ biến mất
+
+                        // Đẩy tất cả NPC xa vị trí hồi sinh để an toàn
+                        npcs.forEach(n => {
+                            let pushAngle = Math.atan2(n.y - player.y, n.x - player.x);
+                            n.x += Math.cos(pushAngle) * 80;
+                            n.y += Math.sin(pushAngle) * 80;
+                        });
                         return;
                     }
 
@@ -852,7 +887,8 @@
 
             slashEffects.forEach((eff) => {
                 ctx.save();
-                ctx.drawImage(processCanvas, eff.x - 25, eff.y - 25, 50, 50);
+                // TĂNG KÍCH THƯỚC SKILL MÈO LÊN GẤP ĐÔI (100x100)
+                ctx.drawImage(processCanvas, eff.x - 50, eff.y - 50, 100, 100);
                 ctx.restore();
                 eff.frame++;
             });
@@ -864,11 +900,11 @@
         function drawTwoTimeAvatar(x, y, skin) {
             ctx.save();
             
-            // 1. Vẽ Đôi Cánh Thiên Thần (Chỉ xuất hiện ở Skin 2)
+            // 1. Vẽ Đôi Cánh Thiên Thần (Chỉ xuất hiện ở Skin 2 - Cuộc sống 2)
             if (skin === 'skin2') {
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2.5;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
 
                 // Cánh trái
                 ctx.beginPath();
@@ -913,17 +949,22 @@
                 ctx.fillStyle = '#000'; ctx.font = 'bold 9px Arial'; ctx.textAlign = 'center'; ctx.fillText('+' + coin.value, coin.x, coin.y + 3);
             });
 
-            // Vẽ Tế Đàn Chiêu Hài (Vòng Tròn Nhỏ Màu Trắng)
+            // Vẽ Tế Đàn Nghi Lễ (Vòng Tròn Màu Trắng Có Biểu Tượng)
             if (ritualCircle.active) {
                 ctx.save();
                 ctx.beginPath();
                 ctx.arc(ritualCircle.x, ritualCircle.y, ritualCircle.radius, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
                 ctx.fill();
                 ctx.strokeStyle = '#ffffff';
                 ctx.lineWidth = 2;
-                ctx.setLineDash([3, 3]);
+                ctx.setLineDash([4, 4]);
                 ctx.stroke();
+                
+                ctx.font = '10px Arial';
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.fillText('🕯️', ritualCircle.x, ritualCircle.y + 3);
                 ctx.restore();
             }
 
@@ -940,7 +981,7 @@
             // Vẽ Nhân Vật Người Chơi
             ctx.save();
             if (ghostInvincible.active && userData.equipped === 'ghost') ctx.globalAlpha = 0.4;
-            if (userData.equipped === 'twotime' && twoTimeStealth) ctx.globalAlpha = 0.3; // Làm mờ khi tàng hình
+            if (userData.equipped === 'twotime' && twoTimeStealth) ctx.globalAlpha = 0.3; // Làm mờ khi Tàng hình
 
             if (userData.equipped === 'twotime') {
                 drawTwoTimeAvatar(player.x, player.y, twoTimeSkin);
