@@ -1046,29 +1046,4 @@
     </script>
 </body>
 </html>
-// Lấy đối tượng audio từ DOM
-const bgMusic = document.getElementById('bg-music');
-
-/**
- * 1. Hàm phát nhạc nền (Màn hình chính / Sảnh chờ / Đăng nhập)
- */
-function playBackgroundMusic() {
-    bgMusic.play().catch(error => {
-        // Trình duyệt có thể chặn tự động phát nhạc nếu người dùng chưa tương tác với trang
-        console.log("Trình duyệt chặn autoplay, chờ người dùng tương tác:", error);
-    });
-}
-
-/**
- * 2. Hàm dừng nhạc nền (Gợi khi chọn vào trận đấu thường hoặc PvP)
- */
-function stopBackgroundMusic() {
-    bgMusic.pause();
-    bgMusic.currentTime = 0; // Đưa thời gian phát về lại ban đầu
-}
-
-// Tự động phát nhạc khi người dùng nhấp bất kỳ đâu trên màn hình (để vượt qua chính sách Autoplay của trình duyệt)
-document.addEventListener('click', function startOnFirstInteraction() {
-    playBackgroundMusic();
-    document.removeEventListener('click', startOnFirstInteraction);
-}, { once: true });
+/
