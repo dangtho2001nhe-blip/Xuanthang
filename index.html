@@ -239,7 +239,7 @@
                     <div class="item-title">🎶 Âm Nhạc</div>
                     <div class="item-desc">C1: Dịch chuyển xa NPC (23s)<br>C2: Phát nhạc (300s)</div>
                 </div>
-                <button id="buy-music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('music', 200)">200 Xu</button>
+                <button id="buy-Music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('Music', 200)">200 Xu</button>
             </div>
             <div class="item-card" style="border: 1px solid #fdcb6e;">
                 <div class="item-info">
@@ -635,7 +635,7 @@
 
             if(userData.equipped === 'music') {
                 bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
-                startCooldown(300, 'skill2Btn');
+                startCooldown(150, 'skill2Btn');
             } else if(userData.equipped === 'twotime') {
                 twoTimeStealth = true;
                 setTimeout(() => { twoTimeStealth = false; }, 3000);
@@ -878,7 +878,7 @@
                         return;
                     }
 
-                    stopGameSession('💀 BẠN ĐÃ CHẾT!');
+                    stopGameSession('Bro quá gà🥀!');
                 }
             });
         }
