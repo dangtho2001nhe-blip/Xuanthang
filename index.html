@@ -192,7 +192,7 @@
         </div>
 
         <div id="tab-rank" class="page-tab hidden">
-            <h3 style="color: #00fff5; margin-top: 5px;">🏆 SỐNG GIAI THÀNH HIỀN THOẠI</h3>
+            <h3 style="color: #00fff5; margin-top: 5px;">🏆 BẢNG XẾP HẠNG THỜI GIAN SỐNG SÓT</h3>
             <table class="lb-table">
                 <thead>
                     <tr>
@@ -208,7 +208,7 @@
         <div id="tab-shop" class="page-tab hidden">
             <div class="item-card">
                 <div class="item-info">
-                    <div class="item-title">👻 Con Điên</div>
+                    <div class="item-title">👻 Con Ma</div>
                     <div class="item-desc">Skill: Bất tử 5s (Hồi 15s)</div>
                 </div>
                 <button id="buy-ghost-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('ghost', 50)">50 Xu</button>
@@ -239,7 +239,7 @@
                     <div class="item-title">🎶 Âm Nhạc</div>
                     <div class="item-desc">C1: Dịch chuyển xa NPC (23s)<br>C2: Phát nhạc (300s)</div>
                 </div>
-                <button id="buy-Music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('Music', 200)">200 Xu</button>
+                <button id="buy-music-btn" class="btn-warning" style="width: 90px;" onclick="buyItem('music', 200)">200 Xu</button>
             </div>
             <div class="item-card" style="border: 1px solid #fdcb6e;">
                 <div class="item-info">
@@ -448,7 +448,7 @@
             list.innerHTML = "";
             const names = { 
                 human: "🧍 Người Bình Thường", 
-                ghost: "👻 Con Điên (Bất Tử)", 
+                ghost: "👻 Con Ma (Bất Tử)", 
                 alien: "👾 Alien (Vòng Năng Lượng)", 
                 cat: "🐱 Mèo (Hoạt Ảnh Vừa Vặn Quái)",
                 witch: "🪼 Phù Thủy (Đẩy NPC Ra Xa)",
@@ -499,7 +499,7 @@
                     userData.claimedCodes.push("twotime");
                     saveData();
                     updateUI();
-                    alert("🎉 Mở khóa thành công nhân vật Độc Quyền: CÁI LỒN!");
+                    alert("🎉 Mở khóa thành công nhân vật Độc Quyền: TWO-TIME!");
                     document.getElementById('giftcode-input').value = "";
                 }
             } else {
@@ -635,7 +635,7 @@
 
             if(userData.equipped === 'music') {
                 bgMusic.currentTime = 0; bgMusic.play().catch(e => console.log(e));
-                startCooldown(150, 'skill2Btn');
+                startCooldown(300, 'skill2Btn');
             } else if(userData.equipped === 'twotime') {
                 twoTimeStealth = true;
                 setTimeout(() => { twoTimeStealth = false; }, 3000);
@@ -878,7 +878,7 @@
                         return;
                     }
 
-                    stopGameSession('Bro quá gà🥀!');
+                    stopGameSession('💀 BẠN ĐÃ CHẾT!');
                 }
             });
         }
@@ -1046,4 +1046,3 @@
     </script>
 </body>
 </html>
-/
