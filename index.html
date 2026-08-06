@@ -120,7 +120,7 @@
 <body>
 
     <video id="catSkillVideo" src="Cat.MOV" playsinline muted style="display:none;"></video>
-    <audio id="bgMusic" src="music.MOV" style="display:none;"></audio>
+    <audio id="bgMusic" src="Music2.MOV" loop style="display:none;"></audio>
 
     <div id="auth-panel" class="card">
         <h2>CYBER WORLD</h2>
@@ -141,7 +141,10 @@
         <div class="money-box">
             <span>👤 <span id="user-display">Player</span> | 💰 <span id="money-display">0</span> Xu</span>
             <span>🏆 Kỷ lục: <span id="best-time-display" style="color:#00fff5;">0s</span></span>
-            <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
+            <div style="display: flex; gap: 4px;">
+                <button id="toggleMusicBtn" class="btn-music" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="toggleMusic()">🔊 Nhạc: Bật</button>
+                <button class="btn-danger" style="width: auto; padding: 2px 6px; margin:0; font-size:10px;" onclick="logout()">Thoát</button>
+            </div>
         </div>
         
         <div class="nav-bar">
@@ -285,6 +288,38 @@
         const processCanvas = document.createElement('canvas');
         const processCtx = processCanvas.getContext('2d');
 
+        let isMusicEnabled = true;
+
+        // BẬT / TẮT NHẠC NỀN
+        function toggleMusic() {
+            isMusicEnabled = !isMusicEnabled;
+            const btn = document.getElementById('toggleMusicBtn');
+            if (isMusicEnabled) {
+                btn.innerText = "🔊 Nhạc: Bật";
+                if (!isGamePlaying) playBackgroundMusic();
+            } else {
+                btn.innerText = "🔇 Nhạc: Tắt";
+                bgMusic.pause();
+            }
+        }
+
+        function playBackgroundMusic() {
+            if (isMusicEnabled) {
+                bgMusic.play().catch(e => console.log("Chờ tương tác để phát nhạc:", e));
+            }
+        }
+
+        function stopBackgroundMusic() {
+            bgMusic.pause();
+            bgMusic.currentTime = 0;
+        }
+
+        // Tự động phát nhạc khi tương tác màn hình lần đầu
+        document.addEventListener('click', function startMusicOnUserGesture() {
+            playBackgroundMusic();
+            document.removeEventListener('click', startMusicOnUserGesture);
+        }, { once: true });
+
         // BẮT SỰ KIỆN BÀN PHÍM
         window.addEventListener('keydown', (e) => {
             if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
@@ -327,11 +362,13 @@
                     updateUI();
                     initGameEngine();
                     initPeerJS();
+                    playBackgroundMusic();
                 }
             }
         };
 
         function handleAuth(type) {
+            playBackgroundMusic();
             let u = document.getElementById('username').value.trim();
             let p = document.getElementById('password').value.trim();
             let st = document.getElementById('status');
@@ -763,6 +800,9 @@
             player.x = 180; player.y = 105;
             droppedCoins = []; slashEffects = [];
             
+            // Dừng nhạc nền sảnh chờ khi chính thức bắt đầu trận đấu
+            stopBackgroundMusic();
+
             // Reset trạng thái Two-Time khi vào trận
             twoTimeRitualUsed = false;
             twoTimeLives = 1;
@@ -791,7 +831,9 @@
             overlay.classList.remove('hidden');
             
             clearTimeout(coinSpawnTimer);
-            bgMusic.pause();
+            
+            // Phát lại nhạc nền khi quay lại sảnh chờ
+            playBackgroundMusic();
             
             stopSurvivalTimer();
             resetSkillCooldowns();
